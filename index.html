@@ -373,6 +373,7 @@
     <script type="module">
         import * as THREE from 'three';
         import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+        import { CSS2DRenderer, CSS2DObject } from 'three/addons/renderers/CSS2DRenderer.js';
 
         // --- QUICK SETUP ---
         const container = document.getElementById('canvas-container');
@@ -392,6 +393,15 @@
         renderer.toneMapping = THREE.ACESFilmicToneMapping;
         renderer.toneMappingExposure = 1.2;
         container.appendChild(renderer.domElement);
+
+        // CSS2 Renderer for labels
+        const labelRenderer = new CSS2DRenderer();
+        labelRenderer.setSize(window.innerWidth, window.innerHeight);
+        labelRenderer.domElement.style.position = 'absolute';
+        labelRenderer.domElement.style.top = '0';
+        labelRenderer.domElement.style.left = '0';
+        labelRenderer.domElement.style.pointerEvents = 'none';
+        container.appendChild(labelRenderer.domElement);
 
         const controls = new OrbitControls(camera, renderer.domElement);
         controls.enableDamping = true;
@@ -543,12 +553,12 @@
             scene.add(g);
             objects.push(g);
 
-            // Label (HTML)
+            // Label (CSS2D)
             const div = document.createElement('div');
             div.textContent = data.name;
             div.style.cssText =
                 'color:#dde;font-size:11px;font-weight:400;text-shadow:0 2px 20px rgba(0,0,0,0.9);background:rgba(10,14,23,0.6);padding:2px 12px;border-radius:12px;backdrop-filter:blur(4px);border:1px solid rgba(255,255,255,0.05);pointer-events:none;';
-            const label = new THREE.CSS2DObject(div);
+            const label = new CSS2DObject(div);
             label.position.set(data.pos[0], h + 1.5, data.pos[2]);
             scene.add(label);
             labels.push(label);
@@ -750,6 +760,7 @@
 
             controls.update();
             renderer.render(scene, camera);
+            labelRenderer.render(scene, camera);
             requestAnimationFrame(animate);
         }
 
@@ -758,6 +769,7 @@
             camera.aspect = window.innerWidth / window.innerHeight;
             camera.updateProjectionMatrix();
             renderer.setSize(window.innerWidth, window.innerHeight);
+            labelRenderer.setSize(window.innerWidth, window.innerHeight);
         });
 
         animate(0);
