@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Atlas - Real-time 3D World Editor</title>
+    <title>Atlas - Real-time 3D World Editor + Simulations</title>
     <style>
         * {
             margin: 0;
@@ -56,10 +56,10 @@
             left: 50%;
             transform: translateX(-50%);
             display: flex;
-            gap: 12px;
-            background: rgba(18, 22, 30, 0.8);
+            gap: 8px;
+            background: rgba(18, 22, 30, 0.85);
             backdrop-filter: blur(16px);
-            padding: 14px 24px;
+            padding: 12px 20px;
             border-radius: 60px;
             border: 1px solid rgba(255, 255, 255, 0.06);
             box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6);
@@ -67,20 +67,22 @@
             z-index: 20;
             flex-wrap: wrap;
             justify-content: center;
+            max-width: 95vw;
         }
         .tool-btn {
             background: transparent;
             border: none;
             color: #aab;
-            padding: 8px 18px;
+            padding: 6px 14px;
             border-radius: 40px;
-            font-size: 0.85rem;
+            font-size: 0.8rem;
             font-weight: 500;
             cursor: pointer;
             transition: all 0.2s;
-            letter-spacing: 0.5px;
+            letter-spacing: 0.3px;
             background: rgba(255, 255, 255, 0.03);
             border: 1px solid transparent;
+            white-space: nowrap;
         }
         .tool-btn:hover {
             background: rgba(255, 255, 255, 0.08);
@@ -92,6 +94,12 @@
             color: white;
             box-shadow: 0 0 20px rgba(42, 125, 225, 0.3);
             border-color: #2a7de1;
+        }
+        .tool-btn.sim-active {
+            background: #e17d2a;
+            color: white;
+            box-shadow: 0 0 20px rgba(225, 125, 42, 0.3);
+            border-color: #e17d2a;
         }
         .tool-btn.primary {
             background: #1f8b4c;
@@ -107,21 +115,31 @@
         .tool-btn.danger:hover {
             background: #d14a4a;
         }
+        .tool-btn.sim-btn {
+            background: rgba(42, 125, 225, 0.15);
+            color: #6af;
+            border-color: rgba(42, 125, 225, 0.2);
+        }
+        .tool-btn.sim-btn:hover {
+            background: rgba(42, 125, 225, 0.25);
+        }
 
         #info-panel {
             position: absolute;
             bottom: 120px;
             right: 30px;
-            background: rgba(11, 14, 20, 0.7);
+            background: rgba(11, 14, 20, 0.8);
             backdrop-filter: blur(12px);
             padding: 18px 22px;
             border-radius: 16px;
             border: 1px solid rgba(255, 255, 255, 0.06);
             font-size: 0.8rem;
-            min-width: 180px;
+            min-width: 200px;
             pointer-events: none;
             z-index: 15;
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            max-height: 60vh;
+            overflow-y: auto;
         }
         #info-panel .label {
             opacity: 0.5;
@@ -141,6 +159,70 @@
         #info-panel .row:last-child {
             margin-bottom: 0;
         }
+        #info-panel .sim-status {
+            color: #6f8;
+        }
+        #info-panel .sim-data {
+            font-size: 0.75rem;
+            opacity: 0.8;
+            margin-top: 2px;
+        }
+
+        #sim-controls {
+            position: absolute;
+            top: 80px;
+            right: 30px;
+            background: rgba(11, 14, 20, 0.8);
+            backdrop-filter: blur(12px);
+            padding: 16px 20px;
+            border-radius: 16px;
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            z-index: 15;
+            min-width: 180px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            pointer-events: auto;
+        }
+        #sim-controls h4 {
+            font-weight: 400;
+            font-size: 0.8rem;
+            opacity: 0.7;
+            margin-bottom: 10px;
+            letter-spacing: 1px;
+        }
+        .sim-toggle {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 6px 0;
+            cursor: pointer;
+            transition: 0.2s;
+            border-radius: 8px;
+            padding: 6px 10px;
+        }
+        .sim-toggle:hover {
+            background: rgba(255, 255, 255, 0.05);
+        }
+        .sim-toggle input[type="checkbox"] {
+            accent-color: #2a7de1;
+            width: 16px;
+            height: 16px;
+            cursor: pointer;
+        }
+        .sim-toggle label {
+            font-size: 0.75rem;
+            cursor: pointer;
+            flex: 1;
+        }
+        .sim-toggle .indicator {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #4a4;
+            transition: 0.3s;
+        }
+        .sim-toggle .indicator.paused {
+            background: #a44;
+        }
 
         #loading {
             position: absolute;
@@ -157,19 +239,31 @@
             border: 1px solid rgba(255, 255, 255, 0.05);
         }
 
+        /* Scrollbar */
+        #info-panel::-webkit-scrollbar {
+            width: 4px;
+        }
+        #info-panel::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        #info-panel::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 10px;
+        }
+
         @media (max-width: 700px) {
             #toolbar {
                 bottom: 20px;
-                padding: 10px 16px;
-                gap: 6px;
+                padding: 8px 12px;
+                gap: 4px;
                 border-radius: 30px;
-                width: 95%;
+                width: 98%;
             }
             .tool-btn {
-                font-size: 0.7rem;
-                padding: 6px 12px;
+                font-size: 0.65rem;
+                padding: 4px 10px;
             }
-            #info-panel {
+            #info-panel, #sim-controls {
                 display: none;
             }
             #hud h1 {
@@ -180,13 +274,13 @@
 </head>
 <body>
 
-    <div id="loading">Loading Atlas ...</div>
+    <div id="loading">Initializing Atlas Simulation Engine...</div>
 
     <div id="canvas-container"></div>
 
     <div id="hud">
-        <h1>🌍 Atlas · Real-time Editor</h1>
-        <div class="sub">interactive 3D · landmarks · live</div>
+        <h1>🌍 Atlas · Simulation Engine</h1>
+        <div class="sub">real-time 3D · multi-simulation · interactive</div>
     </div>
 
     <div id="info-panel">
@@ -199,8 +293,44 @@
             <div class="value" id="coord-label">—</div>
         </div>
         <div class="row">
-            <div class="label">Status</div>
-            <div class="value" id="status-label" style="color:#6f8;">● live</div>
+            <div class="label">Simulation</div>
+            <div class="value sim-status" id="sim-status">● idle</div>
+        </div>
+        <div class="row">
+            <div class="label">Active Sims</div>
+            <div class="value sim-data" id="sim-count">0 / 4</div>
+        </div>
+        <div class="row">
+            <div class="label">Sim Data</div>
+            <div class="value sim-data" id="sim-data">—</div>
+        </div>
+    </div>
+
+    <div id="sim-controls">
+        <h4>⚙️ SIMULATION CONTROLS</h4>
+        <div class="sim-toggle">
+            <input type="checkbox" id="sim-traffic" checked />
+            <label for="sim-traffic">🚗 Traffic Flow</label>
+            <span class="indicator" id="ind-traffic"></span>
+        </div>
+        <div class="sim-toggle">
+            <input type="checkbox" id="sim-population" checked />
+            <label for="sim-population">👥 Population</label>
+            <span class="indicator" id="ind-population"></span>
+        </div>
+        <div class="sim-toggle">
+            <input type="checkbox" id="sim-weather" />
+            <label for="sim-weather">🌤️ Weather</label>
+            <span class="indicator" id="ind-weather"></span>
+        </div>
+        <div class="sim-toggle">
+            <input type="checkbox" id="sim-growth" />
+            <label for="sim-growth">📈 Urban Growth</label>
+            <span class="indicator" id="ind-growth"></span>
+        </div>
+        <div style="margin-top:10px;display:flex;gap:6px;flex-wrap:wrap;">
+            <button class="tool-btn primary" id="sim-reset" style="font-size:0.7rem;padding:4px 12px;">↺ Reset Sims</button>
+            <button class="tool-btn" id="sim-export" style="font-size:0.7rem;padding:4px 12px;">📊 Export Data</button>
         </div>
     </div>
 
@@ -209,8 +339,9 @@
         <button class="tool-btn" data-tool="move">✋ Move</button>
         <button class="tool-btn" data-tool="place">➕ Place</button>
         <button class="tool-btn" data-tool="delete">🗑️ Delete</button>
-        <button class="tool-btn primary" id="save-btn">💾 Save Scene</button>
+        <button class="tool-btn primary" id="save-btn">💾 Save</button>
         <button class="tool-btn danger" id="reset-btn">↺ Reset</button>
+        <button class="tool-btn sim-btn" id="toggle-sim-btn">⏸️ Pause Sims</button>
     </div>
 
     <!-- Import maps and scripts -->
@@ -227,6 +358,174 @@
         import * as THREE from 'three';
         import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
         import { CSS2DRenderer, CSS2DObject } from 'three/addons/renderers/CSS2DRenderer.js';
+
+        // --- SIMULATION ENGINE ---
+        class SimulationEngine {
+            constructor() {
+                this.simulations = {
+                    traffic: { enabled: true, data: {}, tick: 0 },
+                    population: { enabled: true, data: {}, tick: 0 },
+                    weather: { enabled: false, data: {}, tick: 0 },
+                    growth: { enabled: false, data: {}, tick: 0 }
+                };
+                this.paused = false;
+                this.simTime = 0;
+                this.landmarkData = [];
+                this.history = [];
+            }
+
+            initialize(landmarks) {
+                this.landmarkData = landmarks.map(l => ({
+                    ...l,
+                    population: 100 + Math.random() * 900,
+                    traffic: 10 + Math.random() * 90,
+                    growth: 0.5 + Math.random() * 2,
+                    weather: 'clear',
+                    temperature: 15 + Math.random() * 20
+                }));
+            }
+
+            update(deltaTime) {
+                if (this.paused) return;
+
+                this.simTime += deltaTime;
+                const sims = this.simulations;
+
+                // Traffic Flow Simulation
+                if (sims.traffic.enabled) {
+                    sims.traffic.tick += deltaTime;
+                    this.landmarkData.forEach((l, i) => {
+                        // Simulate traffic based on time of day and location
+                        const timeOfDay = (this.simTime % 3600) / 3600; // 0-1
+                        const peakFactor = 1 + 0.8 * Math.sin(timeOfDay * Math.PI * 2);
+                        l.traffic = 20 + 70 * (0.5 + 0.5 * Math.sin(i + this.simTime * 0.1)) * peakFactor;
+                        l.traffic = Math.max(5, Math.min(100, l.traffic));
+                    });
+                    sims.traffic.data = {
+                        avgTraffic: this.landmarkData.reduce((s, l) => s + l.traffic, 0) / this.landmarkData.length,
+                        peak: Math.max(...this.landmarkData.map(l => l.traffic))
+                    };
+                }
+
+                // Population Simulation
+                if (sims.population.enabled) {
+                    sims.population.tick += deltaTime;
+                    this.landmarkData.forEach((l) => {
+                        // Logistic growth with random fluctuations
+                        const growthRate = 0.001 + (l.growth || 1) * 0.002;
+                        const carryingCapacity = 2000 + Math.random() * 3000;
+                        const noise = 1 + 0.02 * Math.sin(this.simTime * 0.05 + l.pos[0]);
+                        l.population += l.population * growthRate * (1 - l.population / carryingCapacity) * noise *
+                            deltaTime * 10;
+                        l.population = Math.max(50, Math.min(carryingCapacity * 1.1, l.population));
+                    });
+                    sims.population.data = {
+                        total: this.landmarkData.reduce((s, l) => s + l.population, 0),
+                        avg: this.landmarkData.reduce((s, l) => s + l.population, 0) / this.landmarkData.length
+                    };
+                }
+
+                // Weather Simulation
+                if (sims.weather.enabled) {
+                    sims.weather.tick += deltaTime;
+                    this.landmarkData.forEach((l) => {
+                        const weatherTypes = ['clear', 'cloudy', 'rain', 'storm', 'fog'];
+                        const tempBase = 15 + 10 * Math.sin(this.simTime * 0.0003 + l.pos[0] * 0.1);
+                        l.temperature = tempBase + 5 * Math.sin(this.simTime * 0.0005 + l.pos[2] * 0.1);
+                        // Weather changes slowly
+                        if (Math.random() < 0.001) {
+                            l.weather = weatherTypes[Math.floor(Math.random() * weatherTypes.length)];
+                        }
+                    });
+                    sims.weather.data = {
+                        avgTemp: this.landmarkData.reduce((s, l) => s + l.temperature, 0) / this.landmarkData.length,
+                        conditions: [...new Set(this.landmarkData.map(l => l.weather))]
+                    };
+                }
+
+                // Urban Growth Simulation
+                if (sims.growth.enabled) {
+                    sims.growth.tick += deltaTime;
+                    this.landmarkData.forEach((l) => {
+                        // Growth affects height and population
+                        const growthFactor = 0.001 + (l.growth || 1) * 0.003;
+                        const heightGrowth = growthFactor * deltaTime * 5;
+                        l.height += heightGrowth;
+                        l.height = Math.min(20, l.height);
+                        // Also affects population
+                        l.population += l.population * growthFactor * deltaTime * 20;
+                    });
+                    sims.growth.data = {
+                        avgHeight: this.landmarkData.reduce((s, l) => s + l.height, 0) / this.landmarkData.length,
+                        totalGrowth: this.landmarkData.reduce((s, l) => s + l.height - (l.originalHeight || 3), 0)
+                    };
+                }
+
+                // Store history every 100 ticks
+                if (Math.floor(this.simTime * 10) % 100 === 0) {
+                    this.history.push({
+                        time: this.simTime,
+                        ...sims.traffic.data,
+                        ...sims.population.data,
+                        ...sims.weather.data,
+                        ...sims.growth.data
+                    });
+                    if (this.history.length > 1000) this.history.shift();
+                }
+            }
+
+            getSimData() {
+                const data = {};
+                Object.keys(this.simulations).forEach(key => {
+                    if (this.simulations[key].enabled) {
+                        data[key] = this.simulations[key].data;
+                    }
+                });
+                return data;
+            }
+
+            toggleSim(name) {
+                if (this.simulations[name]) {
+                    this.simulations[name].enabled = !this.simulations[name].enabled;
+                    return this.simulations[name].enabled;
+                }
+                return false;
+            }
+
+            togglePause() {
+                this.paused = !this.paused;
+                return this.paused;
+            }
+
+            reset() {
+                this.landmarkData.forEach(l => {
+                    l.population = 100 + Math.random() * 900;
+                    l.traffic = 10 + Math.random() * 90;
+                    l.height = l.originalHeight || 3;
+                    l.temperature = 15 + Math.random() * 20;
+                    l.weather = 'clear';
+                });
+                this.simTime = 0;
+                this.history = [];
+                Object.keys(this.simulations).forEach(key => {
+                    this.simulations[key].tick = 0;
+                    this.simulations[key].data = {};
+                });
+            }
+
+            getLandmarkData() {
+                return this.landmarkData;
+            }
+
+            updateLandmarkHeight(index, height) {
+                if (this.landmarkData[index]) {
+                    this.landmarkData[index].height = height;
+                    if (!this.landmarkData[index].originalHeight) {
+                        this.landmarkData[index].originalHeight = height;
+                    }
+                }
+            }
+        }
 
         // --- INIT ---
         const container = document.getElementById('canvas-container');
@@ -252,13 +551,13 @@
         renderer.toneMappingExposure = 1.2;
         container.appendChild(renderer.domElement);
 
-        // CSS2 Renderer for labels
+        // CSS2 Renderer
         const labelRenderer = new CSS2DRenderer();
         labelRenderer.setSize(window.innerWidth, window.innerHeight);
         labelRenderer.domElement.style.position = 'absolute';
         labelRenderer.domElement.style.top = '0';
         labelRenderer.domElement.style.left = '0';
-        labelRenderer.domElement.style.pointerEvents = 'none'; // allow click-through
+        labelRenderer.domElement.style.pointerEvents = 'none';
         container.appendChild(labelRenderer.domElement);
 
         // Controls
@@ -295,8 +594,7 @@
         const hemi = new THREE.HemisphereLight(0x445566, 0x221100, 0.5);
         scene.add(hemi);
 
-        // --- GROUND / GRID ---
-        // Realistic terrain base (large plane with subtle texture)
+        // --- GROUND ---
         const groundGeo = new THREE.PlaneGeometry(200, 200);
         const groundMat = new THREE.MeshStandardMaterial({
             color: 0x1a1f2a,
@@ -311,13 +609,11 @@
         ground.receiveShadow = true;
         scene.add(ground);
 
-        // Grid helper with style
         const gridHelper = new THREE.GridHelper(120, 30, 0x4a6a8a, 0x2a3a4a);
         gridHelper.position.y = -0.4;
         scene.add(gridHelper);
 
-        // --- REAL WORLD LANDMARKS (simulated) ---
-        // Each landmark: position, name, color, height
+        // --- LANDMARK DATA ---
         const landmarkData = [
             { name: 'Eiffel Tower', pos: [-12, 0, -8], color: 0x7a5a3a, height: 6 },
             { name: 'Statue of Liberty', pos: [10, 0, -5], color: 0x6a9a6a, height: 4.5 },
@@ -329,20 +625,34 @@
             { name: 'Burj Khalifa', pos: [20, 0, -20], color: 0x6a8a9a, height: 10 },
         ];
 
+        // --- SIMULATION ENGINE ---
+        const simEngine = new SimulationEngine();
+        simEngine.initialize(landmarkData);
+
         // Store editable objects
         const editableObjects = [];
         const labelObjects = [];
+        const landmarkMeshes = [];
 
-        function createLandmark(data) {
+        function createLandmark(data, simData) {
             const { name, pos, color, height } = data;
             const group = new THREE.Group();
 
+            // Find sim data for this landmark
+            const simInfo = simEngine.landmarkData.find(l => l.name === name && Math.abs(l.pos[0] - pos[0]) < 0.1);
+            const pop = simInfo ? simInfo.population : 100;
+            const traffic = simInfo ? simInfo.traffic : 50;
+            const heightScale = simInfo ? simInfo.height / height : 1;
+
+            // Color based on population density
+            const popColor = new THREE.Color().setHSL(0.6 - (pop / 3000) * 0.4, 0.7, 0.4 + (pop / 3000) * 0.3);
+
             // Base
             const baseMat = new THREE.MeshStandardMaterial({
-                color: color,
+                color: popColor,
                 roughness: 0.5,
                 metalness: 0.2,
-                emissive: new THREE.Color(color).multiplyScalar(0.05),
+                emissive: popColor.clone().multiplyScalar(0.05 + (traffic / 100) * 0.1),
             });
             const baseGeo = new THREE.BoxGeometry(1.8, 0.4, 1.8);
             const baseMesh = new THREE.Mesh(baseGeo, baseMat);
@@ -351,29 +661,32 @@
             baseMesh.receiveShadow = true;
             group.add(baseMesh);
 
-            // Main body (tower/column)
+            // Main body
             const bodyMat = new THREE.MeshStandardMaterial({
-                color: color,
+                color: popColor,
                 roughness: 0.4,
                 metalness: 0.3,
-                emissive: new THREE.Color(color).multiplyScalar(0.03),
+                emissive: popColor.clone().multiplyScalar(0.03 + (traffic / 200) * 0.1),
             });
-            const bodyGeo = new THREE.CylinderGeometry(0.7, 1.0, height, 8);
+            const bodyHeight = height * heightScale;
+            const bodyGeo = new THREE.CylinderGeometry(0.7, 1.0, bodyHeight, 8);
             const bodyMesh = new THREE.Mesh(bodyGeo, bodyMat);
-            bodyMesh.position.y = 0.4 + height / 2;
+            bodyMesh.position.y = 0.4 + bodyHeight / 2;
             bodyMesh.castShadow = true;
             bodyMesh.receiveShadow = true;
             group.add(bodyMesh);
+            landmarkMeshes.push(bodyMesh);
 
-            // Top highlight / beacon
+            // Top beacon (color indicates traffic)
+            const trafficColor = new THREE.Color().setHSL(0.3 - (traffic / 100) * 0.3, 1, 0.5);
             const topMat = new THREE.MeshStandardMaterial({
-                color: 0xffaa44,
-                emissive: 0xff5500,
-                emissiveIntensity: 0.3,
+                color: trafficColor,
+                emissive: trafficColor,
+                emissiveIntensity: 0.3 + (traffic / 100) * 0.5,
             });
             const topGeo = new THREE.SphereGeometry(0.35, 8, 8);
             const topMesh = new THREE.Mesh(topGeo, topMat);
-            topMesh.position.y = 0.4 + height + 0.2;
+            topMesh.position.y = 0.4 + bodyHeight + 0.2;
             topMesh.castShadow = true;
             group.add(topMesh);
 
@@ -384,9 +697,10 @@
                 originalPos: new THREE.Vector3(pos[0], -0.2, pos[2]),
                 height: height,
                 color: color,
+                simIndex: simEngine.landmarkData.findIndex(l => l.name === name && Math.abs(l.pos[0] - pos[0]) < 0.1),
             };
 
-            // Label (CSS2D)
+            // Label
             const labelDiv = document.createElement('div');
             labelDiv.textContent = name;
             labelDiv.style.color = '#dde';
@@ -401,34 +715,61 @@
             labelDiv.style.letterSpacing = '0.5px';
             labelDiv.style.pointerEvents = 'none';
 
+            // Add population info to label
+            const popSpan = document.createElement('span');
+            popSpan.style.fontSize = '10px';
+            popSpan.style.opacity = '0.6';
+            popSpan.style.marginLeft = '8px';
+            popSpan.textContent = `👥 ${Math.round(pop)}`;
+            labelDiv.appendChild(popSpan);
+
             const label = new CSS2DObject(labelDiv);
-            label.position.set(pos[0], height + 1.8, pos[2]);
+            label.position.set(pos[0], bodyHeight + 1.8, pos[2]);
             label.userData = { landmarkGroup: group };
 
             return { group, label };
         }
 
-        // Build landmarks
-        landmarkData.forEach(d => {
-            const { group, label } = createLandmark(d);
-            scene.add(group);
-            scene.add(label);
-            editableObjects.push(group);
-            labelObjects.push(label);
-        });
+        // Build landmarks with simulation data
+        function rebuildLandmarks() {
+            // Clear existing
+            editableObjects.forEach(g => scene.remove(g));
+            labelObjects.forEach(l => scene.remove(l));
+            editableObjects.length = 0;
+            labelObjects.length = 0;
+            landmarkMeshes.length = 0;
 
-        // --- INTERACTION (Raycaster) ---
+            const simData = simEngine.getLandmarkData();
+
+            landmarkData.forEach((d, idx) => {
+                const simInfo = simData[idx] || d;
+                const dataWithSim = {
+                    ...d,
+                    height: simInfo.height || d.height,
+                };
+                const { group, label } = createLandmark(dataWithSim, simInfo);
+                scene.add(group);
+                scene.add(label);
+                editableObjects.push(group);
+                labelObjects.push(label);
+            });
+        }
+
+        rebuildLandmarks();
+
+        // --- INTERACTION ---
         const raycaster = new THREE.Raycaster();
         const pointer = new THREE.Vector2();
         let selectedObject = null;
         let selectedLabel = null;
-        let tool = 'select'; // select | move | place | delete
+        let tool = 'select';
 
-        // UI elements
         const selectedLabelEl = document.getElementById('selected-label');
         const coordLabelEl = document.getElementById('coord-label');
+        const simStatusEl = document.getElementById('sim-status');
+        const simCountEl = document.getElementById('sim-count');
+        const simDataEl = document.getElementById('sim-data');
 
-        // Highlight material
         const highlightMat = new THREE.MeshStandardMaterial({
             color: 0x2a7de1,
             emissive: 0x2a7de1,
@@ -449,7 +790,6 @@
         function highlightObject(group) {
             clearHighlight();
             if (!group) return;
-            // Create a bounding box highlight
             const box = new THREE.Box3().setFromObject(group);
             const size = box.getSize(new THREE.Vector3());
             const center = box.getCenter(new THREE.Vector3());
@@ -466,7 +806,6 @@
             pointer.y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
             raycaster.setFromCamera(pointer, camera);
 
-            // Check against all editable objects (children meshes)
             const meshes = [];
             editableObjects.forEach(group => {
                 group.children.forEach(child => {
@@ -489,14 +828,28 @@
             return null;
         }
 
-        // --- PLACE NEW LANDMARK ---
+        function selectObject(group, label) {
+            clearHighlight();
+            selectedObject = group;
+            selectedLabel = label;
+            if (group) {
+                highlightObject(group);
+                const name = group.userData.name || 'Unnamed';
+                const pos = group.position;
+                selectedLabelEl.textContent = name;
+                coordLabelEl.textContent = `${pos.x.toFixed(1)}, ${pos.z.toFixed(1)}`;
+            } else {
+                selectedLabelEl.textContent = '—';
+                coordLabelEl.textContent = '—';
+            }
+        }
+
         function placeNewLandmark(event) {
             const rect = renderer.domElement.getBoundingClientRect();
             pointer.x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
             pointer.y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
             raycaster.setFromCamera(pointer, camera);
 
-            // Intersect with ground plane (y=0)
             const plane = new THREE.Plane(new THREE.Vector3(0, 1, 0), 0);
             const target = new THREE.Vector3();
             raycaster.ray.intersectPlane(plane, target);
@@ -505,256 +858,4 @@
                 const name = `Landmark ${editableObjects.length + 1}`;
                 const color = Math.floor(Math.random() * 0xffffff);
                 const height = 2 + Math.random() * 6;
-                const data = {
-                    name: name,
-                    pos: [target.x, 0, target.z],
-                    color: color,
-                    height: height,
-                };
-                const { group, label } = createLandmark(data);
-                scene.add(group);
-                scene.add(label);
-                editableObjects.push(group);
-                labelObjects.push(label);
-                // Select the new one
-                selectObject(group, label);
-                updateInfoPanel(group);
-            }
-        }
-
-        // --- SELECT ---
-        function selectObject(group, label) {
-            if (selectedObject) {
-                // restore original material colors (we'll just clear highlight)
-                clearHighlight();
-            }
-            selectedObject = group;
-            selectedLabel = label;
-            if (group) {
-                highlightObject(group);
-                updateInfoPanel(group);
-            } else {
-                selectedLabelEl.textContent = '—';
-                coordLabelEl.textContent = '—';
-            }
-        }
-
-        function updateInfoPanel(group) {
-            if (!group) {
-                selectedLabelEl.textContent = '—';
-                coordLabelEl.textContent = '—';
-                return;
-            }
-            const name = group.userData.name || 'Unnamed';
-            const pos = group.position;
-            selectedLabelEl.textContent = name;
-            coordLabelEl.textContent = `${pos.x.toFixed(1)}, ${pos.z.toFixed(1)}`;
-        }
-
-        // --- DELETE ---
-        function deleteSelected() {
-            if (!selectedObject) return;
-            // Remove from scene
-            scene.remove(selectedObject);
-            // Remove corresponding label
-            if (selectedLabel) {
-                scene.remove(selectedLabel);
-                const idx = labelObjects.indexOf(selectedLabel);
-                if (idx > -1) labelObjects.splice(idx, 1);
-            }
-            const idx = editableObjects.indexOf(selectedObject);
-            if (idx > -1) editableObjects.splice(idx, 1);
-            clearHighlight();
-            selectedObject = null;
-            selectedLabel = null;
-            selectedLabelEl.textContent = '—';
-            coordLabelEl.textContent = '—';
-        }
-
-        // --- SAVE / RESET ---
-        function saveScene() {
-            const data = editableObjects.map(g => ({
-                name: g.userData.name,
-                pos: [g.position.x, g.position.y, g.position.z],
-                color: g.userData.color,
-                height: g.userData.height,
-            }));
-            const json = JSON.stringify(data, null, 2);
-            const blob = new Blob([json], { type: 'application/json' });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = 'atlas_scene.json';
-            a.click();
-            URL.revokeObjectURL(url);
-        }
-
-        function resetScene() {
-            // Remove all editable objects
-            editableObjects.forEach(g => scene.remove(g));
-            labelObjects.forEach(l => scene.remove(l));
-            editableObjects.length = 0;
-            labelObjects.length = 0;
-            clearHighlight();
-            selectedObject = null;
-            selectedLabel = null;
-            selectedLabelEl.textContent = '—';
-            coordLabelEl.textContent = '—';
-
-            // Rebuild from initial data
-            landmarkData.forEach(d => {
-                const { group, label } = createLandmark(d);
-                scene.add(group);
-                scene.add(label);
-                editableObjects.push(group);
-                labelObjects.push(label);
-            });
-        }
-
-        // --- EVENT HANDLERS ---
-        renderer.domElement.addEventListener('click', (event) => {
-            if (tool === 'place') {
-                placeNewLandmark(event);
-                return;
-            }
-
-            const group = getIntersection(event);
-            if (tool === 'select') {
-                if (group) {
-                    const label = labelObjects.find(l => l.userData.landmarkGroup === group);
-                    selectObject(group, label);
-                } else {
-                    selectObject(null, null);
-                }
-            } else if (tool === 'delete') {
-                if (group) {
-                    // find label
-                    const label = labelObjects.find(l => l.userData.landmarkGroup === group);
-                    if (label) {
-                        scene.remove(label);
-                        const idx = labelObjects.indexOf(label);
-                        if (idx > -1) labelObjects.splice(idx, 1);
-                    }
-                    scene.remove(group);
-                    const idx = editableObjects.indexOf(group);
-                    if (idx > -1) editableObjects.splice(idx, 1);
-                    if (selectedObject === group) {
-                        clearHighlight();
-                        selectedObject = null;
-                        selectedLabel = null;
-                        selectedLabelEl.textContent = '—';
-                        coordLabelEl.textContent = '—';
-                    }
-                }
-            } else if (tool === 'move') {
-                // Move is handled via drag (simplified: click to reposition to ground)
-                if (group) {
-                    const rect = renderer.domElement.getBoundingClientRect();
-                    pointer.x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
-                    pointer.y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
-                    raycaster.setFromCamera(pointer, camera);
-                    const plane = new THREE.Plane(new THREE.Vector3(0, 1, 0), 0);
-                    const target = new THREE.Vector3();
-                    raycaster.ray.intersectPlane(plane, target);
-                    if (target) {
-                        // Keep y same as original (ground level)
-                        group.position.x = target.x;
-                        group.position.z = target.z;
-                        // Update label position
-                        const label = labelObjects.find(l => l.userData.landmarkGroup === group);
-                        if (label) {
-                            const height = group.userData.height || 3;
-                            label.position.set(target.x, height + 1.8, target.z);
-                        }
-                        updateInfoPanel(group);
-                    }
-                }
-            }
-        });
-
-        // Tool buttons
-        document.querySelectorAll('[data-tool]').forEach(btn => {
-            btn.addEventListener('click', () => {
-                document.querySelectorAll('[data-tool]').forEach(b => b.classList.remove('active'));
-                btn.classList.add('active');
-                tool = btn.dataset.tool;
-                // Change cursor
-                renderer.domElement.style.cursor = tool === 'select' ? 'pointer' :
-                    tool === 'move' ? 'grab' :
-                    tool === 'place' ? 'crosshair' :
-                    tool === 'delete' ? 'not-allowed' : 'default';
-            });
-        });
-
-        document.getElementById('save-btn').addEventListener('click', saveScene);
-        document.getElementById('reset-btn').addEventListener('click', resetScene);
-
-        // --- RESIZE ---
-        window.addEventListener('resize', () => {
-            camera.aspect = window.innerWidth / window.innerHeight;
-            camera.updateProjectionMatrix();
-            renderer.setSize(window.innerWidth, window.innerHeight);
-            labelRenderer.setSize(window.innerWidth, window.innerHeight);
-        });
-
-        // --- ANIMATION LOOP ---
-        function animate() {
-            requestAnimationFrame(animate);
-            controls.update();
-
-            // subtle floating animation for landmarks
-            const time = Date.now() * 0.001;
-            editableObjects.forEach((g, i) => {
-                const offset = i * 0.5;
-                g.position.y = -0.2 + Math.sin(time * 0.6 + offset) * 0.04;
-                // update label y to follow
-                const label = labelObjects.find(l => l.userData.landmarkGroup === g);
-                if (label) {
-                    const height = g.userData.height || 3;
-                    label.position.y = g.position.y + height + 1.8;
-                    label.position.x = g.position.x;
-                    label.position.z = g.position.z;
-                }
-            });
-
-            renderer.render(scene, camera);
-            labelRenderer.render(scene, camera);
-        }
-
-        animate();
-
-        // Hide loading
-        loading.style.display = 'none';
-
-        // Initial selection highlight (first landmark)
-        if (editableObjects.length > 0) {
-            setTimeout(() => {
-                const first = editableObjects[0];
-                const label = labelObjects.find(l => l.userData.landmarkGroup === first);
-                selectObject(first, label);
-            }, 300);
-        }
-
-        console.log('🌍 Atlas initialized — real-time 3D world editor');
-        console.log('💡 Tools: Select, Move, Place, Delete');
-        console.log('🏛️ Landmarks are interactive and editable.');
-
-        // --- KEYBOARD SHORTCUTS ---
-        document.addEventListener('keydown', (e) => {
-            if (e.key === '1') { document.querySelector('[data-tool="select"]').click();
-                e.preventDefault(); }
-            if (e.key === '2') { document.querySelector('[data-tool="move"]').click();
-                e.preventDefault(); }
-            if (e.key === '3') { document.querySelector('[data-tool="place"]').click();
-                e.preventDefault(); }
-            if (e.key === '4') { document.querySelector('[data-tool="delete"]').click();
-                e.preventDefault(); }
-            if (e.key === 's' && (e.metaKey || e.ctrlKey)) { e.preventDefault();
-                saveScene(); }
-            if (e.key === 'Delete' || e.key === 'Backspace') { deleteSelected();
-                e.preventDefault(); }
-        });
-
-    </script>
-</body>
-</html>
+                const data = { name, pos: [target.x,
