@@ -1,0 +1,760 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Atlas - Real-time 3D World Editor</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Segoe UI', system-ui, sans-serif;
+            background: #0b0e14;
+            color: #e8edf5;
+            overflow: hidden;
+            height: 100vh;
+        }
+        #canvas-container {
+            width: 100vw;
+            height: 100vh;
+            display: block;
+        }
+
+        /* HUD Overlay */
+        #hud {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            pointer-events: none;
+            z-index: 10;
+        }
+        #hud h1 {
+            font-weight: 300;
+            font-size: 1.5rem;
+            letter-spacing: 2px;
+            background: rgba(11, 14, 20, 0.7);
+            padding: 8px 18px;
+            border-radius: 30px;
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            display: inline-block;
+        }
+        #hud .sub {
+            font-size: 0.75rem;
+            opacity: 0.6;
+            margin-top: 6px;
+            padding-left: 10px;
+            letter-spacing: 1px;
+        }
+
+        #toolbar {
+            position: absolute;
+            bottom: 40px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 12px;
+            background: rgba(18, 22, 30, 0.8);
+            backdrop-filter: blur(16px);
+            padding: 14px 24px;
+            border-radius: 60px;
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6);
+            pointer-events: auto;
+            z-index: 20;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        .tool-btn {
+            background: transparent;
+            border: none;
+            color: #aab;
+            padding: 8px 18px;
+            border-radius: 40px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            letter-spacing: 0.5px;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid transparent;
+        }
+        .tool-btn:hover {
+            background: rgba(255, 255, 255, 0.08);
+            color: #fff;
+            border-color: rgba(255, 255, 255, 0.1);
+        }
+        .tool-btn.active {
+            background: #2a7de1;
+            color: white;
+            box-shadow: 0 0 20px rgba(42, 125, 225, 0.3);
+            border-color: #2a7de1;
+        }
+        .tool-btn.primary {
+            background: #1f8b4c;
+            color: white;
+        }
+        .tool-btn.primary:hover {
+            background: #28a85e;
+        }
+        .tool-btn.danger {
+            background: #b13e3e;
+            color: white;
+        }
+        .tool-btn.danger:hover {
+            background: #d14a4a;
+        }
+
+        #info-panel {
+            position: absolute;
+            bottom: 120px;
+            right: 30px;
+            background: rgba(11, 14, 20, 0.7);
+            backdrop-filter: blur(12px);
+            padding: 18px 22px;
+            border-radius: 16px;
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            font-size: 0.8rem;
+            min-width: 180px;
+            pointer-events: none;
+            z-index: 15;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+        }
+        #info-panel .label {
+            opacity: 0.5;
+            font-size: 0.65rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        #info-panel .value {
+            font-size: 0.95rem;
+            font-weight: 400;
+            margin-top: 4px;
+            font-variant-numeric: tabular-nums;
+        }
+        #info-panel .row {
+            margin-bottom: 8px;
+        }
+        #info-panel .row:last-child {
+            margin-bottom: 0;
+        }
+
+        #loading {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: #aab;
+            font-size: 0.9rem;
+            background: rgba(0, 0, 0, 0.5);
+            padding: 10px 24px;
+            border-radius: 40px;
+            backdrop-filter: blur(4px);
+            z-index: 5;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        @media (max-width: 700px) {
+            #toolbar {
+                bottom: 20px;
+                padding: 10px 16px;
+                gap: 6px;
+                border-radius: 30px;
+                width: 95%;
+            }
+            .tool-btn {
+                font-size: 0.7rem;
+                padding: 6px 12px;
+            }
+            #info-panel {
+                display: none;
+            }
+            #hud h1 {
+                font-size: 1.1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div id="loading">Loading Atlas ...</div>
+
+    <div id="canvas-container"></div>
+
+    <div id="hud">
+        <h1>🌍 Atlas · Real-time Editor</h1>
+        <div class="sub">interactive 3D · landmarks · live</div>
+    </div>
+
+    <div id="info-panel">
+        <div class="row">
+            <div class="label">Selected</div>
+            <div class="value" id="selected-label">—</div>
+        </div>
+        <div class="row">
+            <div class="label">Coordinates</div>
+            <div class="value" id="coord-label">—</div>
+        </div>
+        <div class="row">
+            <div class="label">Status</div>
+            <div class="value" id="status-label" style="color:#6f8;">● live</div>
+        </div>
+    </div>
+
+    <div id="toolbar">
+        <button class="tool-btn active" data-tool="select">🔍 Select</button>
+        <button class="tool-btn" data-tool="move">✋ Move</button>
+        <button class="tool-btn" data-tool="place">➕ Place</button>
+        <button class="tool-btn" data-tool="delete">🗑️ Delete</button>
+        <button class="tool-btn primary" id="save-btn">💾 Save Scene</button>
+        <button class="tool-btn danger" id="reset-btn">↺ Reset</button>
+    </div>
+
+    <!-- Import maps and scripts -->
+    <script type="importmap">
+        {
+            "imports": {
+                "three": "https://unpkg.com/three@0.128.0/build/three.module.js",
+                "three/addons/": "https://unpkg.com/three@0.128.0/examples/jsm/"
+            }
+        }
+    </script>
+
+    <script type="module">
+        import * as THREE from 'three';
+        import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+        import { CSS2DRenderer, CSS2DObject } from 'three/addons/renderers/CSS2DRenderer.js';
+
+        // --- INIT ---
+        const container = document.getElementById('canvas-container');
+        const loading = document.getElementById('loading');
+
+        // Scene
+        const scene = new THREE.Scene();
+        scene.background = new THREE.Color(0x0b0e14);
+        scene.fog = new THREE.Fog(0x0b0e14, 80, 200);
+
+        // Camera
+        const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 500);
+        camera.position.set(25, 20, 35);
+        camera.lookAt(0, 0, 0);
+
+        // WebGL Renderer
+        const renderer = new THREE.WebGLRenderer({ antialias: true });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+        renderer.shadowMap.enabled = true;
+        renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+        renderer.toneMapping = THREE.ACESFilmicToneMapping;
+        renderer.toneMappingExposure = 1.2;
+        container.appendChild(renderer.domElement);
+
+        // CSS2 Renderer for labels
+        const labelRenderer = new CSS2DRenderer();
+        labelRenderer.setSize(window.innerWidth, window.innerHeight);
+        labelRenderer.domElement.style.position = 'absolute';
+        labelRenderer.domElement.style.top = '0';
+        labelRenderer.domElement.style.left = '0';
+        labelRenderer.domElement.style.pointerEvents = 'none'; // allow click-through
+        container.appendChild(labelRenderer.domElement);
+
+        // Controls
+        const controls = new OrbitControls(camera, renderer.domElement);
+        controls.enableDamping = true;
+        controls.dampingFactor = 0.08;
+        controls.screenSpacePanning = true;
+        controls.maxPolarAngle = Math.PI / 2.1;
+        controls.minDistance = 3;
+        controls.maxDistance = 120;
+        controls.target.set(0, 2, 0);
+
+        // --- LIGHTING ---
+        const ambient = new THREE.AmbientLight(0x404060, 0.6);
+        scene.add(ambient);
+
+        const sun = new THREE.DirectionalLight(0xffeedd, 1.2);
+        sun.position.set(40, 50, 30);
+        sun.castShadow = true;
+        sun.shadow.mapSize.width = 1024;
+        sun.shadow.mapSize.height = 1024;
+        sun.shadow.camera.near = 0.5;
+        sun.shadow.camera.far = 150;
+        sun.shadow.camera.left = -60;
+        sun.shadow.camera.right = 60;
+        sun.shadow.camera.top = 60;
+        sun.shadow.camera.bottom = -60;
+        scene.add(sun);
+
+        const fill = new THREE.DirectionalLight(0x8888ff, 0.3);
+        fill.position.set(-30, 20, -40);
+        scene.add(fill);
+
+        const hemi = new THREE.HemisphereLight(0x445566, 0x221100, 0.5);
+        scene.add(hemi);
+
+        // --- GROUND / GRID ---
+        // Realistic terrain base (large plane with subtle texture)
+        const groundGeo = new THREE.PlaneGeometry(200, 200);
+        const groundMat = new THREE.MeshStandardMaterial({
+            color: 0x1a1f2a,
+            roughness: 0.8,
+            metalness: 0.1,
+            transparent: true,
+            opacity: 0.9,
+        });
+        const ground = new THREE.Mesh(groundGeo, groundMat);
+        ground.rotation.x = -Math.PI / 2;
+        ground.position.y = -0.5;
+        ground.receiveShadow = true;
+        scene.add(ground);
+
+        // Grid helper with style
+        const gridHelper = new THREE.GridHelper(120, 30, 0x4a6a8a, 0x2a3a4a);
+        gridHelper.position.y = -0.4;
+        scene.add(gridHelper);
+
+        // --- REAL WORLD LANDMARKS (simulated) ---
+        // Each landmark: position, name, color, height
+        const landmarkData = [
+            { name: 'Eiffel Tower', pos: [-12, 0, -8], color: 0x7a5a3a, height: 6 },
+            { name: 'Statue of Liberty', pos: [10, 0, -5], color: 0x6a9a6a, height: 4.5 },
+            { name: 'Big Ben', pos: [-5, 0, 14], color: 0x8a7a5a, height: 5 },
+            { name: 'Colosseum', pos: [14, 0, 10], color: 0x9a7a5a, height: 3.5 },
+            { name: 'Sydney Opera', pos: [-14, 0, 16], color: 0x7a9aaa, height: 4 },
+            { name: 'Taj Mahal', pos: [8, 0, -16], color: 0xdaaa7a, height: 5.5 },
+            { name: 'Pyramid', pos: [-18, 0, -18], color: 0x8a7a5a, height: 7 },
+            { name: 'Burj Khalifa', pos: [20, 0, -20], color: 0x6a8a9a, height: 10 },
+        ];
+
+        // Store editable objects
+        const editableObjects = [];
+        const labelObjects = [];
+
+        function createLandmark(data) {
+            const { name, pos, color, height } = data;
+            const group = new THREE.Group();
+
+            // Base
+            const baseMat = new THREE.MeshStandardMaterial({
+                color: color,
+                roughness: 0.5,
+                metalness: 0.2,
+                emissive: new THREE.Color(color).multiplyScalar(0.05),
+            });
+            const baseGeo = new THREE.BoxGeometry(1.8, 0.4, 1.8);
+            const baseMesh = new THREE.Mesh(baseGeo, baseMat);
+            baseMesh.position.y = 0.2;
+            baseMesh.castShadow = true;
+            baseMesh.receiveShadow = true;
+            group.add(baseMesh);
+
+            // Main body (tower/column)
+            const bodyMat = new THREE.MeshStandardMaterial({
+                color: color,
+                roughness: 0.4,
+                metalness: 0.3,
+                emissive: new THREE.Color(color).multiplyScalar(0.03),
+            });
+            const bodyGeo = new THREE.CylinderGeometry(0.7, 1.0, height, 8);
+            const bodyMesh = new THREE.Mesh(bodyGeo, bodyMat);
+            bodyMesh.position.y = 0.4 + height / 2;
+            bodyMesh.castShadow = true;
+            bodyMesh.receiveShadow = true;
+            group.add(bodyMesh);
+
+            // Top highlight / beacon
+            const topMat = new THREE.MeshStandardMaterial({
+                color: 0xffaa44,
+                emissive: 0xff5500,
+                emissiveIntensity: 0.3,
+            });
+            const topGeo = new THREE.SphereGeometry(0.35, 8, 8);
+            const topMesh = new THREE.Mesh(topGeo, topMat);
+            topMesh.position.y = 0.4 + height + 0.2;
+            topMesh.castShadow = true;
+            group.add(topMesh);
+
+            group.position.set(pos[0], -0.2, pos[2]);
+            group.userData = {
+                type: 'landmark',
+                name: name,
+                originalPos: new THREE.Vector3(pos[0], -0.2, pos[2]),
+                height: height,
+                color: color,
+            };
+
+            // Label (CSS2D)
+            const labelDiv = document.createElement('div');
+            labelDiv.textContent = name;
+            labelDiv.style.color = '#dde';
+            labelDiv.style.fontSize = '14px';
+            labelDiv.style.fontWeight = '400';
+            labelDiv.style.textShadow = '0 2px 20px rgba(0,0,0,0.9), 0 0 10px rgba(0,0,0,0.8)';
+            labelDiv.style.background = 'rgba(10,14,22,0.6)';
+            labelDiv.style.padding = '4px 14px';
+            labelDiv.style.borderRadius = '20px';
+            labelDiv.style.backdropFilter = 'blur(4px)';
+            labelDiv.style.border = '1px solid rgba(255,255,255,0.06)';
+            labelDiv.style.letterSpacing = '0.5px';
+            labelDiv.style.pointerEvents = 'none';
+
+            const label = new CSS2DObject(labelDiv);
+            label.position.set(pos[0], height + 1.8, pos[2]);
+            label.userData = { landmarkGroup: group };
+
+            return { group, label };
+        }
+
+        // Build landmarks
+        landmarkData.forEach(d => {
+            const { group, label } = createLandmark(d);
+            scene.add(group);
+            scene.add(label);
+            editableObjects.push(group);
+            labelObjects.push(label);
+        });
+
+        // --- INTERACTION (Raycaster) ---
+        const raycaster = new THREE.Raycaster();
+        const pointer = new THREE.Vector2();
+        let selectedObject = null;
+        let selectedLabel = null;
+        let tool = 'select'; // select | move | place | delete
+
+        // UI elements
+        const selectedLabelEl = document.getElementById('selected-label');
+        const coordLabelEl = document.getElementById('coord-label');
+
+        // Highlight material
+        const highlightMat = new THREE.MeshStandardMaterial({
+            color: 0x2a7de1,
+            emissive: 0x2a7de1,
+            emissiveIntensity: 0.2,
+            transparent: true,
+            opacity: 0.6,
+        });
+
+        let highlightMesh = null;
+
+        function clearHighlight() {
+            if (highlightMesh) {
+                scene.remove(highlightMesh);
+                highlightMesh = null;
+            }
+        }
+
+        function highlightObject(group) {
+            clearHighlight();
+            if (!group) return;
+            // Create a bounding box highlight
+            const box = new THREE.Box3().setFromObject(group);
+            const size = box.getSize(new THREE.Vector3());
+            const center = box.getCenter(new THREE.Vector3());
+            const geo = new THREE.BoxGeometry(size.x + 0.3, size.y + 0.3, size.z + 0.3);
+            const mesh = new THREE.Mesh(geo, highlightMat);
+            mesh.position.copy(center);
+            scene.add(mesh);
+            highlightMesh = mesh;
+        }
+
+        function getIntersection(event) {
+            const rect = renderer.domElement.getBoundingClientRect();
+            pointer.x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
+            pointer.y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
+            raycaster.setFromCamera(pointer, camera);
+
+            // Check against all editable objects (children meshes)
+            const meshes = [];
+            editableObjects.forEach(group => {
+                group.children.forEach(child => {
+                    if (child.isMesh) {
+                        meshes.push(child);
+                    }
+                });
+            });
+            const intersects = raycaster.intersectObjects(meshes);
+            if (intersects.length > 0) {
+                const hitMesh = intersects[0].object;
+                let parentGroup = hitMesh.parent;
+                while (parentGroup && !editableObjects.includes(parentGroup)) {
+                    parentGroup = parentGroup.parent;
+                }
+                if (parentGroup && editableObjects.includes(parentGroup)) {
+                    return parentGroup;
+                }
+            }
+            return null;
+        }
+
+        // --- PLACE NEW LANDMARK ---
+        function placeNewLandmark(event) {
+            const rect = renderer.domElement.getBoundingClientRect();
+            pointer.x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
+            pointer.y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
+            raycaster.setFromCamera(pointer, camera);
+
+            // Intersect with ground plane (y=0)
+            const plane = new THREE.Plane(new THREE.Vector3(0, 1, 0), 0);
+            const target = new THREE.Vector3();
+            raycaster.ray.intersectPlane(plane, target);
+
+            if (target) {
+                const name = `Landmark ${editableObjects.length + 1}`;
+                const color = Math.floor(Math.random() * 0xffffff);
+                const height = 2 + Math.random() * 6;
+                const data = {
+                    name: name,
+                    pos: [target.x, 0, target.z],
+                    color: color,
+                    height: height,
+                };
+                const { group, label } = createLandmark(data);
+                scene.add(group);
+                scene.add(label);
+                editableObjects.push(group);
+                labelObjects.push(label);
+                // Select the new one
+                selectObject(group, label);
+                updateInfoPanel(group);
+            }
+        }
+
+        // --- SELECT ---
+        function selectObject(group, label) {
+            if (selectedObject) {
+                // restore original material colors (we'll just clear highlight)
+                clearHighlight();
+            }
+            selectedObject = group;
+            selectedLabel = label;
+            if (group) {
+                highlightObject(group);
+                updateInfoPanel(group);
+            } else {
+                selectedLabelEl.textContent = '—';
+                coordLabelEl.textContent = '—';
+            }
+        }
+
+        function updateInfoPanel(group) {
+            if (!group) {
+                selectedLabelEl.textContent = '—';
+                coordLabelEl.textContent = '—';
+                return;
+            }
+            const name = group.userData.name || 'Unnamed';
+            const pos = group.position;
+            selectedLabelEl.textContent = name;
+            coordLabelEl.textContent = `${pos.x.toFixed(1)}, ${pos.z.toFixed(1)}`;
+        }
+
+        // --- DELETE ---
+        function deleteSelected() {
+            if (!selectedObject) return;
+            // Remove from scene
+            scene.remove(selectedObject);
+            // Remove corresponding label
+            if (selectedLabel) {
+                scene.remove(selectedLabel);
+                const idx = labelObjects.indexOf(selectedLabel);
+                if (idx > -1) labelObjects.splice(idx, 1);
+            }
+            const idx = editableObjects.indexOf(selectedObject);
+            if (idx > -1) editableObjects.splice(idx, 1);
+            clearHighlight();
+            selectedObject = null;
+            selectedLabel = null;
+            selectedLabelEl.textContent = '—';
+            coordLabelEl.textContent = '—';
+        }
+
+        // --- SAVE / RESET ---
+        function saveScene() {
+            const data = editableObjects.map(g => ({
+                name: g.userData.name,
+                pos: [g.position.x, g.position.y, g.position.z],
+                color: g.userData.color,
+                height: g.userData.height,
+            }));
+            const json = JSON.stringify(data, null, 2);
+            const blob = new Blob([json], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'atlas_scene.json';
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+
+        function resetScene() {
+            // Remove all editable objects
+            editableObjects.forEach(g => scene.remove(g));
+            labelObjects.forEach(l => scene.remove(l));
+            editableObjects.length = 0;
+            labelObjects.length = 0;
+            clearHighlight();
+            selectedObject = null;
+            selectedLabel = null;
+            selectedLabelEl.textContent = '—';
+            coordLabelEl.textContent = '—';
+
+            // Rebuild from initial data
+            landmarkData.forEach(d => {
+                const { group, label } = createLandmark(d);
+                scene.add(group);
+                scene.add(label);
+                editableObjects.push(group);
+                labelObjects.push(label);
+            });
+        }
+
+        // --- EVENT HANDLERS ---
+        renderer.domElement.addEventListener('click', (event) => {
+            if (tool === 'place') {
+                placeNewLandmark(event);
+                return;
+            }
+
+            const group = getIntersection(event);
+            if (tool === 'select') {
+                if (group) {
+                    const label = labelObjects.find(l => l.userData.landmarkGroup === group);
+                    selectObject(group, label);
+                } else {
+                    selectObject(null, null);
+                }
+            } else if (tool === 'delete') {
+                if (group) {
+                    // find label
+                    const label = labelObjects.find(l => l.userData.landmarkGroup === group);
+                    if (label) {
+                        scene.remove(label);
+                        const idx = labelObjects.indexOf(label);
+                        if (idx > -1) labelObjects.splice(idx, 1);
+                    }
+                    scene.remove(group);
+                    const idx = editableObjects.indexOf(group);
+                    if (idx > -1) editableObjects.splice(idx, 1);
+                    if (selectedObject === group) {
+                        clearHighlight();
+                        selectedObject = null;
+                        selectedLabel = null;
+                        selectedLabelEl.textContent = '—';
+                        coordLabelEl.textContent = '—';
+                    }
+                }
+            } else if (tool === 'move') {
+                // Move is handled via drag (simplified: click to reposition to ground)
+                if (group) {
+                    const rect = renderer.domElement.getBoundingClientRect();
+                    pointer.x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
+                    pointer.y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
+                    raycaster.setFromCamera(pointer, camera);
+                    const plane = new THREE.Plane(new THREE.Vector3(0, 1, 0), 0);
+                    const target = new THREE.Vector3();
+                    raycaster.ray.intersectPlane(plane, target);
+                    if (target) {
+                        // Keep y same as original (ground level)
+                        group.position.x = target.x;
+                        group.position.z = target.z;
+                        // Update label position
+                        const label = labelObjects.find(l => l.userData.landmarkGroup === group);
+                        if (label) {
+                            const height = group.userData.height || 3;
+                            label.position.set(target.x, height + 1.8, target.z);
+                        }
+                        updateInfoPanel(group);
+                    }
+                }
+            }
+        });
+
+        // Tool buttons
+        document.querySelectorAll('[data-tool]').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('[data-tool]').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                tool = btn.dataset.tool;
+                // Change cursor
+                renderer.domElement.style.cursor = tool === 'select' ? 'pointer' :
+                    tool === 'move' ? 'grab' :
+                    tool === 'place' ? 'crosshair' :
+                    tool === 'delete' ? 'not-allowed' : 'default';
+            });
+        });
+
+        document.getElementById('save-btn').addEventListener('click', saveScene);
+        document.getElementById('reset-btn').addEventListener('click', resetScene);
+
+        // --- RESIZE ---
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            labelRenderer.setSize(window.innerWidth, window.innerHeight);
+        });
+
+        // --- ANIMATION LOOP ---
+        function animate() {
+            requestAnimationFrame(animate);
+            controls.update();
+
+            // subtle floating animation for landmarks
+            const time = Date.now() * 0.001;
+            editableObjects.forEach((g, i) => {
+                const offset = i * 0.5;
+                g.position.y = -0.2 + Math.sin(time * 0.6 + offset) * 0.04;
+                // update label y to follow
+                const label = labelObjects.find(l => l.userData.landmarkGroup === g);
+                if (label) {
+                    const height = g.userData.height || 3;
+                    label.position.y = g.position.y + height + 1.8;
+                    label.position.x = g.position.x;
+                    label.position.z = g.position.z;
+                }
+            });
+
+            renderer.render(scene, camera);
+            labelRenderer.render(scene, camera);
+        }
+
+        animate();
+
+        // Hide loading
+        loading.style.display = 'none';
+
+        // Initial selection highlight (first landmark)
+        if (editableObjects.length > 0) {
+            setTimeout(() => {
+                const first = editableObjects[0];
+                const label = labelObjects.find(l => l.userData.landmarkGroup === first);
+                selectObject(first, label);
+            }, 300);
+        }
+
+        console.log('🌍 Atlas initialized — real-time 3D world editor');
+        console.log('💡 Tools: Select, Move, Place, Delete');
+        console.log('🏛️ Landmarks are interactive and editable.');
+
+        // --- KEYBOARD SHORTCUTS ---
+        document.addEventListener('keydown', (e) => {
+            if (e.key === '1') { document.querySelector('[data-tool="select"]').click();
+                e.preventDefault(); }
+            if (e.key === '2') { document.querySelector('[data-tool="move"]').click();
+                e.preventDefault(); }
+            if (e.key === '3') { document.querySelector('[data-tool="place"]').click();
+                e.preventDefault(); }
+            if (e.key === '4') { document.querySelector('[data-tool="delete"]').click();
+                e.preventDefault(); }
+            if (e.key === 's' && (e.metaKey || e.ctrlKey)) { e.preventDefault();
+                saveScene(); }
+            if (e.key === 'Delete' || e.key === 'Backspace') { deleteSelected();
+                e.preventDefault(); }
+        });
+
+    </script>
+</body>
+</html>
