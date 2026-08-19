@@ -12,7 +12,7 @@
         }
         body {
             font-family: 'Segoe UI', system-ui, sans-serif;
-            background: #0b0e14;
+            background: #0a0e17;
             color: #e8edf5;
             overflow: hidden;
             height: 100vh;
@@ -32,34 +32,34 @@
         }
         #hud h1 {
             font-weight: 300;
-            font-size: 1.5rem;
+            font-size: 1.3rem;
             letter-spacing: 2px;
-            background: rgba(11, 14, 20, 0.7);
-            padding: 8px 18px;
+            background: rgba(10, 14, 23, 0.8);
+            padding: 6px 16px;
             border-radius: 30px;
             backdrop-filter: blur(8px);
-            border: 1px solid rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.06);
             display: inline-block;
         }
         #hud .sub {
-            font-size: 0.75rem;
-            opacity: 0.6;
-            margin-top: 6px;
+            font-size: 0.7rem;
+            opacity: 0.5;
+            margin-top: 4px;
             padding-left: 10px;
             letter-spacing: 1px;
         }
 
         #toolbar {
             position: absolute;
-            bottom: 40px;
+            bottom: 30px;
             left: 50%;
             transform: translateX(-50%);
             display: flex;
-            gap: 6px;
-            background: rgba(18, 22, 30, 0.85);
+            gap: 4px;
+            background: rgba(10, 14, 23, 0.9);
             backdrop-filter: blur(16px);
-            padding: 10px 16px;
-            border-radius: 50px;
+            padding: 8px 14px;
+            border-radius: 40px;
             border: 1px solid rgba(255, 255, 255, 0.06);
             box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6);
             pointer-events: auto;
@@ -71,13 +71,13 @@
         .tool-btn {
             background: transparent;
             border: none;
-            color: #aab;
-            padding: 5px 12px;
-            border-radius: 30px;
-            font-size: 0.75rem;
+            color: #8899bb;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 0.7rem;
             font-weight: 500;
             cursor: pointer;
-            transition: all 0.2s;
+            transition: all 0.15s;
             letter-spacing: 0.3px;
             background: rgba(255, 255, 255, 0.03);
             border: 1px solid transparent;
@@ -86,13 +86,11 @@
         .tool-btn:hover {
             background: rgba(255, 255, 255, 0.08);
             color: #fff;
-            border-color: rgba(255, 255, 255, 0.1);
         }
         .tool-btn.active {
             background: #2a7de1;
             color: white;
-            box-shadow: 0 0 20px rgba(42, 125, 225, 0.3);
-            border-color: #2a7de1;
+            box-shadow: 0 0 20px rgba(42, 125, 225, 0.2);
         }
         .tool-btn.primary {
             background: #1f8b4c;
@@ -108,65 +106,53 @@
         .tool-btn.danger:hover {
             background: #d14a4a;
         }
-        .tool-btn.ocean-btn {
+        .tool-btn.ocean {
             background: rgba(0, 150, 255, 0.15);
             color: #4af;
-            border-color: rgba(0, 150, 255, 0.2);
         }
-        .tool-btn.ocean-btn:hover {
+        .tool-btn.ocean:hover {
             background: rgba(0, 150, 255, 0.25);
         }
-        .tool-btn.ocean-btn.active {
+        .tool-btn.ocean.active {
             background: #0077be;
             color: white;
-            box-shadow: 0 0 20px rgba(0, 119, 190, 0.3);
-            border-color: #0077be;
         }
-        .tool-btn.sim-btn {
+        .tool-btn.sim {
             background: rgba(42, 125, 225, 0.15);
             color: #6af;
-            border-color: rgba(42, 125, 225, 0.2);
         }
-        .tool-btn.sim-btn:hover {
+        .tool-btn.sim:hover {
             background: rgba(42, 125, 225, 0.25);
         }
-        .tool-btn.sim-active {
-            background: #e17d2a;
-            color: white;
-            box-shadow: 0 0 20px rgba(225, 125, 42, 0.3);
-            border-color: #e17d2a;
-        }
 
-        #info-panel {
+        #info {
             position: absolute;
-            bottom: 120px;
+            bottom: 100px;
             right: 20px;
-            background: rgba(11, 14, 20, 0.85);
+            background: rgba(10, 14, 23, 0.85);
             backdrop-filter: blur(12px);
-            padding: 14px 18px;
-            border-radius: 14px;
+            padding: 12px 16px;
+            border-radius: 12px;
             border: 1px solid rgba(255, 255, 255, 0.06);
-            font-size: 0.75rem;
-            min-width: 160px;
+            font-size: 0.7rem;
+            min-width: 140px;
             pointer-events: none;
             z-index: 15;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
         }
-        #info-panel .label {
+        #info .label {
             opacity: 0.4;
-            font-size: 0.6rem;
+            font-size: 0.55rem;
             text-transform: uppercase;
             letter-spacing: 1px;
         }
-        #info-panel .value {
-            font-size: 0.85rem;
-            font-weight: 400;
-            margin-top: 2px;
+        #info .value {
+            font-size: 0.8rem;
+            margin-top: 1px;
         }
-        #info-panel .row {
-            margin-bottom: 6px;
+        #info .row {
+            margin-bottom: 4px;
         }
-        #info-panel .row:last-child {
+        #info .row:last-child {
             margin-bottom: 0;
         }
         .ocean-data {
@@ -176,59 +162,57 @@
             color: #6f8;
         }
 
-        #sim-controls {
+        #controls {
             position: absolute;
             top: 80px;
             right: 20px;
-            background: rgba(11, 14, 20, 0.85);
+            background: rgba(10, 14, 23, 0.85);
             backdrop-filter: blur(12px);
-            padding: 14px 16px;
-            border-radius: 14px;
+            padding: 12px 14px;
+            border-radius: 12px;
             border: 1px solid rgba(255, 255, 255, 0.06);
             z-index: 15;
-            min-width: 150px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            min-width: 120px;
             pointer-events: auto;
         }
-        #sim-controls h4 {
+        #controls h4 {
             font-weight: 400;
-            font-size: 0.7rem;
-            opacity: 0.6;
-            margin-bottom: 8px;
+            font-size: 0.65rem;
+            opacity: 0.5;
+            margin-bottom: 6px;
             letter-spacing: 1px;
         }
-        .sim-toggle {
+        .toggle-item {
             display: flex;
             align-items: center;
-            gap: 8px;
-            padding: 4px 0;
+            gap: 6px;
+            padding: 3px 0;
             cursor: pointer;
-            transition: 0.2s;
-            border-radius: 6px;
-            padding: 4px 8px;
+            border-radius: 4px;
+            padding: 2px 6px;
         }
-        .sim-toggle:hover {
+        .toggle-item:hover {
             background: rgba(255, 255, 255, 0.05);
         }
-        .sim-toggle input[type="checkbox"] {
+        .toggle-item input[type="checkbox"] {
             accent-color: #2a7de1;
-            width: 14px;
-            height: 14px;
+            width: 12px;
+            height: 12px;
             cursor: pointer;
         }
-        .sim-toggle label {
-            font-size: 0.7rem;
+        .toggle-item label {
+            font-size: 0.65rem;
             cursor: pointer;
             flex: 1;
         }
-        .sim-toggle .indicator {
-            width: 6px;
-            height: 6px;
+        .dot {
+            width: 5px;
+            height: 5px;
             border-radius: 50%;
             background: #4a4;
             transition: 0.3s;
         }
-        .sim-toggle .indicator.paused {
+        .dot.paused {
             background: #a44;
         }
 
@@ -236,50 +220,34 @@
             position: absolute;
             top: 80px;
             left: 20px;
-            background: rgba(11, 14, 20, 0.85);
+            background: rgba(10, 14, 23, 0.85);
             backdrop-filter: blur(12px);
-            padding: 14px 16px;
-            border-radius: 14px;
+            padding: 12px 14px;
+            border-radius: 12px;
             border: 1px solid rgba(255, 255, 255, 0.06);
             z-index: 15;
-            min-width: 140px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            min-width: 120px;
             pointer-events: auto;
         }
         #ocean-controls h4 {
             font-weight: 400;
-            font-size: 0.7rem;
-            opacity: 0.6;
-            margin-bottom: 8px;
+            font-size: 0.65rem;
+            opacity: 0.5;
+            margin-bottom: 6px;
             letter-spacing: 1px;
             color: #4af;
         }
-        .ocean-slider {
+        .slider {
             width: 100%;
-            margin: 4px 0;
+            margin: 2px 0;
             accent-color: #0077be;
-            height: 4px;
+            height: 3px;
         }
-        .ocean-slider-label {
+        .slider-label {
             display: flex;
             justify-content: space-between;
-            font-size: 0.6rem;
-            opacity: 0.5;
-        }
-        .ocean-control-btn {
-            background: rgba(0, 150, 255, 0.1);
-            border: 1px solid rgba(0, 150, 255, 0.2);
-            color: #4af;
-            padding: 4px 12px;
-            border-radius: 20px;
-            font-size: 0.65rem;
-            cursor: pointer;
-            transition: 0.2s;
-            margin-top: 6px;
-            width: 100%;
-        }
-        .ocean-control-btn:hover {
-            background: rgba(0, 150, 255, 0.2);
+            font-size: 0.55rem;
+            opacity: 0.4;
         }
 
         #loading {
@@ -287,11 +255,11 @@
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            color: #aab;
-            font-size: 0.9rem;
+            color: #8899bb;
+            font-size: 0.8rem;
             background: rgba(0, 0, 0, 0.5);
-            padding: 10px 24px;
-            border-radius: 40px;
+            padding: 8px 20px;
+            border-radius: 30px;
             backdrop-filter: blur(4px);
             z-index: 5;
             border: 1px solid rgba(255, 255, 255, 0.05);
@@ -300,103 +268,86 @@
         @media (max-width: 700px) {
             #toolbar {
                 bottom: 10px;
-                padding: 6px 10px;
-                gap: 3px;
+                padding: 4px 8px;
+                gap: 2px;
                 border-radius: 20px;
-                width: 98%;
             }
             .tool-btn {
-                font-size: 0.6rem;
-                padding: 3px 8px;
+                font-size: 0.55rem;
+                padding: 2px 6px;
             }
-            #info-panel,
-            #sim-controls,
+            #info,
+            #controls,
             #ocean-controls {
                 display: none;
             }
             #hud h1 {
-                font-size: 1rem;
+                font-size: 0.9rem;
             }
         }
     </style>
 </head>
 <body>
 
-    <div id="loading">🌊 Initializing Atlas Ocean Simulation...</div>
+    <div id="loading">🌊 Loading Atlas...</div>
 
     <div id="canvas-container"></div>
 
     <div id="hud">
         <h1>🌊 Atlas · Ocean Engine</h1>
-        <div class="sub">real-time 3D · dynamic waves · multi-simulation</div>
+        <div class="sub">real-time 3D · simulations · interactive</div>
     </div>
 
-    <div id="info-panel">
+    <div id="info">
         <div class="row">
             <div class="label">Selected</div>
             <div class="value" id="selected-label">—</div>
         </div>
         <div class="row">
-            <div class="label">Coordinates</div>
-            <div class="value" id="coord-label">—</div>
-        </div>
-        <div class="row">
-            <div class="label">Ocean State</div>
+            <div class="label">Ocean</div>
             <div class="value ocean-data" id="ocean-state">🌊 calm</div>
         </div>
         <div class="row">
             <div class="label">Wave Height</div>
-            <div class="value ocean-data" id="wave-height">1.0 m</div>
+            <div class="value ocean-data" id="wave-height">0.5m</div>
         </div>
         <div class="row">
-            <div class="label">Sim Status</div>
+            <div class="label">Status</div>
             <div class="value sim-status" id="sim-status">● running</div>
         </div>
     </div>
 
     <div id="ocean-controls">
         <h4>🌊 OCEAN</h4>
-        <div class="ocean-slider-label">
-            <span>Height</span>
-            <span id="wave-slider-value">0.5</span>
-        </div>
-        <input type="range" class="ocean-slider" id="wave-height-slider" min="0" max="2" step="0.1" value="0.5" />
-        <div class="ocean-slider-label" style="margin-top:6px;">
-            <span>Speed</span>
-            <span id="speed-slider-value">1.0</span>
-        </div>
-        <input type="range" class="ocean-slider" id="wave-speed-slider" min="0.1" max="3" step="0.1" value="1.0" />
-        <div class="ocean-slider-label" style="margin-top:6px;">
-            <span>Foam</span>
-            <span id="foam-slider-value">0.5</span>
-        </div>
-        <input type="range" class="ocean-slider" id="foam-slider" min="0" max="1" step="0.05" value="0.5" />
-        <button class="ocean-control-btn" id="toggle-ocean-btn">⏸️ Pause Waves</button>
+        <div class="slider-label"><span>Height</span><span id="h-val">0.5</span></div>
+        <input type="range" class="slider" id="height-slider" min="0" max="2" step="0.1" value="0.5" />
+        <div class="slider-label" style="margin-top:4px;"><span>Speed</span><span id="s-val">1.0</span></div>
+        <input type="range" class="slider" id="speed-slider" min="0.1" max="3" step="0.1" value="1.0" />
+        <button style="width:100%;margin-top:6px;background:rgba(0,150,255,0.1);border:1px solid rgba(0,150,255,0.2);color:#4af;padding:3px;border-radius:12px;font-size:0.6rem;cursor:pointer;" id="toggle-ocean">⏸️ Pause</button>
     </div>
 
-    <div id="sim-controls">
+    <div id="controls">
         <h4>⚙️ SIMULATIONS</h4>
-        <div class="sim-toggle">
+        <div class="toggle-item">
             <input type="checkbox" id="sim-traffic" checked />
             <label for="sim-traffic">🚗 Traffic</label>
-            <span class="indicator" id="ind-traffic"></span>
+            <span class="dot" id="dot-traffic"></span>
         </div>
-        <div class="sim-toggle">
+        <div class="toggle-item">
             <input type="checkbox" id="sim-population" checked />
             <label for="sim-population">👥 Population</label>
-            <span class="indicator" id="ind-population"></span>
+            <span class="dot" id="dot-population"></span>
         </div>
-        <div class="sim-toggle">
+        <div class="toggle-item">
             <input type="checkbox" id="sim-weather" />
             <label for="sim-weather">🌤️ Weather</label>
-            <span class="indicator" id="ind-weather"></span>
+            <span class="dot" id="dot-weather"></span>
         </div>
-        <div class="sim-toggle">
+        <div class="toggle-item">
             <input type="checkbox" id="sim-growth" />
             <label for="sim-growth">📈 Growth</label>
-            <span class="indicator" id="ind-growth"></span>
+            <span class="dot" id="dot-growth"></span>
         </div>
-        <button class="ocean-control-btn" id="sim-reset-btn" style="margin-top:8px;">↺ Reset All</button>
     </div>
 
     <div id="toolbar">
@@ -406,8 +357,8 @@
         <button class="tool-btn" data-tool="delete">🗑️ Delete</button>
         <button class="tool-btn primary" id="save-btn">💾 Save</button>
         <button class="tool-btn danger" id="reset-btn">↺ Reset</button>
-        <button class="tool-btn sim-btn" id="toggle-sim-btn">⏸️ Pause Sims</button>
-        <button class="tool-btn ocean-btn active" id="toggle-ocean-btn2">🌊 Ocean</button>
+        <button class="tool-btn sim" id="pause-sims">⏸️ Sims</button>
+        <button class="tool-btn ocean active" id="ocean-btn">🌊 Ocean</button>
     </div>
 
     <script type="importmap">
@@ -422,414 +373,396 @@
     <script type="module">
         import * as THREE from 'three';
         import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
-        import { CSS2DRenderer, CSS2DObject } from 'three/addons/renderers/CSS2DRenderer.js';
 
-        // --- SIMULATION ENGINE ---
-        class SimulationEngine {
-            constructor() {
-                this.simulations = {
-                    traffic: { enabled: true, data: {}, tick: 0 },
-                    population: { enabled: true, data: {}, tick: 0 },
-                    weather: { enabled: false, data: {}, tick: 0 },
-                    growth: { enabled: false, data: {}, tick: 0 }
-                };
-                this.paused = false;
-                this.simTime = 0;
-                this.landmarkData = [];
-                this.history = [];
-            }
-
-            initialize(landmarks) {
-                this.landmarkData = landmarks.map(l => ({
-                    ...l,
-                    population: 100 + Math.random() * 900,
-                    traffic: 10 + Math.random() * 90,
-                    growth: 0.5 + Math.random() * 2,
-                    weather: 'clear',
-                    temperature: 15 + Math.random() * 20,
-                    originalHeight: l.height || 3,
-                }));
-            }
-
-            update(deltaTime) {
-                if (this.paused) return;
-                this.simTime += deltaTime;
-                const sims = this.simulations;
-
-                if (sims.traffic.enabled) {
-                    sims.traffic.tick += deltaTime;
-                    this.landmarkData.forEach((l, i) => {
-                        const timeOfDay = (this.simTime % 3600) / 3600;
-                        const peakFactor = 1 + 0.8 * Math.sin(timeOfDay * Math.PI * 2);
-                        l.traffic = 20 + 70 * (0.5 + 0.5 * Math.sin(i + this.simTime * 0.1)) * peakFactor;
-                        l.traffic = Math.max(5, Math.min(100, l.traffic));
-                    });
-                    sims.traffic.data = {
-                        avgTraffic: this.landmarkData.reduce((s, l) => s + l.traffic, 0) / this.landmarkData.length,
-                        peak: Math.max(...this.landmarkData.map(l => l.traffic))
-                    };
-                }
-
-                if (sims.population.enabled) {
-                    sims.population.tick += deltaTime;
-                    this.landmarkData.forEach((l) => {
-                        const growthRate = 0.001 + (l.growth || 1) * 0.002;
-                        const carryingCapacity = 2000 + Math.random() * 3000;
-                        const noise = 1 + 0.02 * Math.sin(this.simTime * 0.05 + l.pos[0]);
-                        l.population += l.population * growthRate * (1 - l.population / carryingCapacity) * noise *
-                            deltaTime * 10;
-                        l.population = Math.max(50, Math.min(carryingCapacity * 1.1, l.population));
-                    });
-                    sims.population.data = {
-                        total: this.landmarkData.reduce((s, l) => s + l.population, 0),
-                        avg: this.landmarkData.reduce((s, l) => s + l.population, 0) / this.landmarkData.length
-                    };
-                }
-
-                if (sims.weather.enabled) {
-                    sims.weather.tick += deltaTime;
-                    this.landmarkData.forEach((l) => {
-                        const weatherTypes = ['clear', 'cloudy', 'rain', 'storm', 'fog'];
-                        const tempBase = 15 + 10 * Math.sin(this.simTime * 0.0003 + l.pos[0] * 0.1);
-                        l.temperature = tempBase + 5 * Math.sin(this.simTime * 0.0005 + l.pos[2] * 0.1);
-                        if (Math.random() < 0.001) {
-                            l.weather = weatherTypes[Math.floor(Math.random() * weatherTypes.length)];
-                        }
-                    });
-                    sims.weather.data = {
-                        avgTemp: this.landmarkData.reduce((s, l) => s + l.temperature, 0) / this.landmarkData.length,
-                        conditions: [...new Set(this.landmarkData.map(l => l.weather))]
-                    };
-                }
-
-                if (sims.growth.enabled) {
-                    sims.growth.tick += deltaTime;
-                    this.landmarkData.forEach((l) => {
-                        const growthFactor = 0.001 + (l.growth || 1) * 0.003;
-                        const heightGrowth = growthFactor * deltaTime * 5;
-                        l.height += heightGrowth;
-                        l.height = Math.min(20, l.height);
-                        l.population += l.population * growthFactor * deltaTime * 20;
-                    });
-                    sims.growth.data = {
-                        avgHeight: this.landmarkData.reduce((s, l) => s + l.height, 0) / this.landmarkData.length,
-                        totalGrowth: this.landmarkData.reduce((s, l) => s + l.height - (l.originalHeight || 3), 0)
-                    };
-                }
-            }
-
-            getLandmarkData() {
-                return this.landmarkData;
-            }
-
-            togglePause() {
-                this.paused = !this.paused;
-                return this.paused;
-            }
-
-            toggleSim(name) {
-                if (this.simulations[name]) {
-                    this.simulations[name].enabled = !this.simulations[name].enabled;
-                    return this.simulations[name].enabled;
-                }
-                return false;
-            }
-
-            reset() {
-                this.landmarkData.forEach(l => {
-                    l.population = 100 + Math.random() * 900;
-                    l.traffic = 10 + Math.random() * 90;
-                    l.height = l.originalHeight || 3;
-                    l.temperature = 15 + Math.random() * 20;
-                    l.weather = 'clear';
-                });
-                this.simTime = 0;
-                this.history = [];
-                Object.keys(this.simulations).forEach(key => {
-                    this.simulations[key].tick = 0;
-                    this.simulations[key].data = {};
-                });
-            }
-        }
-
-        // --- OCEAN SYSTEM ---
-        class OceanSystem {
-            constructor(scene) {
-                this.scene = scene;
-                this.waveHeight = 0.5;
-                this.waveSpeed = 1.0;
-                this.foamIntensity = 0.5;
-                this.enabled = true;
-                this.time = 0;
-                this.segments = 128;
-
-                this.createOcean();
-                this.createParticles();
-                this.createSkyDome();
-            }
-
-            createOcean() {
-                const geometry = new THREE.PlaneGeometry(200, 200, this.segments, this.segments);
-                geometry.rotateX(-Math.PI / 2);
-
-                const material = new THREE.ShaderMaterial({
-                    uniforms: {
-                        time: { value: 0 },
-                        waveHeight: { value: this.waveHeight },
-                        waveSpeed: { value: this.waveSpeed },
-                        foamIntensity: { value: this.foamIntensity },
-                        waterColor: { value: new THREE.Color(0x006994) },
-                        deepColor: { value: new THREE.Color(0x001a33) },
-                        foamColor: { value: new THREE.Color(0xffffff) },
-                    },
-                    vertexShader: `
-                        uniform float time;
-                        uniform float waveHeight;
-                        uniform float waveSpeed;
-
-                        varying float vHeight;
-                        varying vec2 vUv;
-                        varying vec3 vNormal;
-
-                        void main() {
-                            vUv = uv;
-                            vec3 pos = position;
-
-                            float h = 0.0;
-                            for (float i = 0.0; i < 8.0; i++) {
-                                float freq = 0.5 + i * 0.3;
-                                float amp = waveHeight * (0.5 + 0.5 * sin(i * 1.7));
-                                float speed = waveSpeed * (0.8 + i * 0.1);
-                                float angle = i * 1.2 + 0.5;
-                                vec2 dir = vec2(cos(angle), sin(angle));
-                                float wave = sin(dot(pos.xz, dir) * freq + time * speed);
-                                h += wave * amp;
-                            }
-                            h /= 2.0;
-                            pos.y += h;
-                            vHeight = h;
-
-                            float eps = 0.1;
-                            float hx = 0.0;
-                            float hz = 0.0;
-                            for (float i = 0.0; i < 8.0; i++) {
-                                float freq = 0.5 + i * 0.3;
-                                float amp = waveHeight * (0.5 + 0.5 * sin(i * 1.7));
-                                float speed = waveSpeed * (0.8 + i * 0.1);
-                                float angle = i * 1.2 + 0.5;
-                                vec2 dir = vec2(cos(angle), sin(angle));
-                                float wave = sin(dot(pos.xz, dir) * freq + time * speed);
-                                hx += wave * amp * freq * dir.x;
-                                hz += wave * amp * freq * dir.y;
-                            }
-                            hx /= 2.0;
-                            hz /= 2.0;
-                            vec3 normal = normalize(vec3(-hx, 1.0, -hz));
-                            vNormal = normal;
-
-                            gl_Position = projectionMatrix * modelViewMatrix * vec4(pos, 1.0);
-                        }
-                    `,
-                    fragmentShader: `
-                        uniform vec3 waterColor;
-                        uniform vec3 deepColor;
-                        uniform vec3 foamColor;
-                        uniform float foamIntensity;
-                        uniform float waveHeight;
-
-                        varying float vHeight;
-                        varying vec2 vUv;
-                        varying vec3 vNormal;
-
-                        void main() {
-                            vec3 viewDir = vec3(0.0, 1.0, 0.0);
-                            float fresnel = 1.0 - max(dot(viewDir, vNormal), 0.0);
-                            fresnel = pow(fresnel, 3.0);
-
-                            float depthFactor = 0.5 + 0.5 * vHeight / max(waveHeight, 0.1);
-                            vec3 color = mix(deepColor, waterColor, depthFactor);
-
-                            float foam = smoothstep(0.3, 0.7, vHeight / max(waveHeight, 0.1));
-                            foam *= foamIntensity;
-                            color = mix(color, foamColor, foam * 0.5);
-
-                            float spec = pow(max(dot(vNormal, viewDir), 0.0), 32.0);
-                            color += vec3(1.0, 1.0, 0.8) * spec * 0.3;
-                            color += vec3(0.4, 0.6, 0.8) * fresnel * 0.3;
-
-                            gl_FragColor = vec4(color, 0.85);
-                        }
-                    `,
-                    transparent: true,
-                    side: THREE.DoubleSide,
-                });
-
-                this.oceanMesh = new THREE.Mesh(geometry, material);
-                this.oceanMesh.position.y = -0.3;
-                this.oceanMesh.receiveShadow = true;
-                this.scene.add(this.oceanMesh);
-            }
-
-            createParticles() {
-                const particleCount = 800;
-                const geometry = new THREE.BufferGeometry();
-                const positions = new Float32Array(particleCount * 3);
-                const velocities = new Float32Array(particleCount * 3);
-
-                for (let i = 0; i < particleCount; i++) {
-                    positions[i * 3] = (Math.random() - 0.5) * 160;
-                    positions[i * 3 + 1] = Math.random() * 2 - 0.5;
-                    positions[i * 3 + 2] = (Math.random() - 0.5) * 160;
-                    velocities[i * 3] = (Math.random() - 0.5) * 0.3;
-                    velocities[i * 3 + 1] = Math.random() * 0.3 + 0.1;
-                    velocities[i * 3 + 2] = (Math.random() - 0.5) * 0.3;
-                }
-
-                geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
-
-                const material = new THREE.PointsMaterial({
-                    color: 0x88ccff,
-                    size: 0.2,
-                    transparent: true,
-                    opacity: 0.3,
-                    blending: THREE.AdditiveBlending,
-                    depthWrite: false,
-                });
-
-                this.particles = new THREE.Points(geometry, material);
-                this.scene.add(this.particles);
-                this.particleVelocities = velocities;
-            }
-
-            createSkyDome() {
-                const skyGeo = new THREE.SphereGeometry(150, 32, 32);
-                const skyMat = new THREE.ShaderMaterial({
-                    uniforms: {
-                        time: { value: 0 },
-                    },
-                    vertexShader: `
-                        varying vec3 vPosition;
-                        void main() {
-                            vPosition = position;
-                            gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
-                        }
-                    `,
-                    fragmentShader: `
-                        uniform float time;
-                        varying vec3 vPosition;
-
-                        void main() {
-                            vec3 pos = normalize(vPosition);
-                            float cloud = sin(pos.x * 5.0 + time * 0.02) * cos(pos.z * 7.0 + time * 0.015) * 0.5 + 0.5;
-                            cloud *= sin(pos.y * 8.0 + time * 0.01) * 0.5 + 0.5;
-                            vec3 color = mix(vec3(0.05, 0.08, 0.15), vec3(0.3, 0.5, 0.8), cloud * 0.6 + 0.2);
-                            float gradient = 0.5 + 0.5 * pos.y;
-                            color = mix(vec3(0.02, 0.04, 0.08), color, gradient);
-                            gl_FragColor = vec4(color, 0.4);
-                        }
-                    `,
-                    transparent: true,
-                    side: THREE.BackSide,
-                });
-                this.skySphere = new THREE.Mesh(skyGeo, skyMat);
-                this.skySphere.position.y = 30;
-                this.scene.add(this.skySphere);
-            }
-
-            update(delta) {
-                if (!this.enabled) return;
-                this.time += delta * this.waveSpeed;
-
-                if (this.oceanMesh) {
-                    this.oceanMesh.material.uniforms.time.value = this.time;
-                    this.oceanMesh.material.uniforms.waveHeight.value = this.waveHeight;
-                    this.oceanMesh.material.uniforms.waveSpeed.value = this.waveSpeed;
-                    this.oceanMesh.material.uniforms.foamIntensity.value = this.foamIntensity;
-                }
-
-                if (this.skySphere) {
-                    this.skySphere.material.uniforms.time.value = this.time;
-                    this.skySphere.rotation.y += delta * 0.001;
-                }
-
-                if (this.particles) {
-                    const positions = this.particles.geometry.attributes.position.array;
-                    for (let i = 0; i < positions.length / 3; i++) {
-                        const x = positions[i * 3];
-                        const z = positions[i * 3 + 2];
-                        const waveHeight = this.waveHeight * 0.5;
-                        const wave = Math.sin(x * 0.3 + this.time * 0.5) * Math.cos(z * 0.2 + this.time * 0.3) * waveHeight;
-
-                        positions[i * 3 + 1] += this.particleVelocities[i * 3 + 1] * delta * 0.5;
-
-                        if (positions[i * 3 + 1] > 2 + wave || positions[i * 3 + 1] < -1) {
-                            positions[i * 3] = (Math.random() - 0.5) * 160;
-                            positions[i * 3 + 1] = -0.5 + Math.random() * 0.5;
-                            positions[i * 3 + 2] = (Math.random() - 0.5) * 160;
-                            this.particleVelocities[i * 3 + 1] = Math.random() * 0.3 + 0.1;
-                        }
-
-                        positions[i * 3] += this.particleVelocities[i * 3] * delta * 0.2;
-                        positions[i * 3 + 2] += this.particleVelocities[i * 3 + 2] * delta * 0.2;
-                    }
-                    this.particles.geometry.attributes.position.needsUpdate = true;
-                    this.particles.material.opacity = 0.15 + this.foamIntensity * 0.25;
-                }
-
-                // Update UI
-                const state = this.getOceanState();
-                document.getElementById('ocean-state').textContent = state.emoji + ' ' + state.text;
-                document.getElementById('wave-height').textContent = (this.waveHeight * 2).toFixed(1) + ' m';
-            }
-
-            getOceanState() {
-                const h = this.waveHeight;
-                if (h < 0.3) return { emoji: '🌊', text: 'calm' };
-                if (h < 0.6) return { emoji: '🌊', text: 'moderate' };
-                if (h < 1.2) return { emoji: '🌊', text: 'rough' };
-                return { emoji: '🌊', text: 'stormy' };
-            }
-
-            toggle() {
-                this.enabled = !this.enabled;
-                if (this.oceanMesh) this.oceanMesh.visible = this.enabled;
-                if (this.particles) this.particles.visible = this.enabled;
-                return this.enabled;
-            }
-        }
-
-        // --- INITIALIZATION ---
+        // --- QUICK SETUP ---
         const container = document.getElementById('canvas-container');
-        const loading = document.getElementById('loading');
+        document.getElementById('loading').style.display = 'none';
 
-        // Scene setup
         const scene = new THREE.Scene();
-        scene.background = new THREE.Color(0x0b0e14);
-        scene.fog = new THREE.Fog(0x0b0e14, 80, 200);
+        scene.background = new THREE.Color(0x0a0e17);
+        scene.fog = new THREE.Fog(0x0a0e17, 60, 150);
 
         const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 500);
-        camera.position.set(25, 15, 35);
-        camera.lookAt(0, 0, 0);
+        camera.position.set(20, 12, 28);
 
         const renderer = new THREE.WebGLRenderer({ antialias: true });
         renderer.setSize(window.innerWidth, window.innerHeight);
         renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
         renderer.shadowMap.enabled = true;
-        renderer.shadowMap.type = THREE.PCFSoftShadowMap;
         renderer.toneMapping = THREE.ACESFilmicToneMapping;
         renderer.toneMappingExposure = 1.2;
         container.appendChild(renderer.domElement);
 
-        const labelRenderer = new CSS2DRenderer();
-        labelRenderer.setSize(window.innerWidth, window.innerHeight);
-        labelRenderer.domElement.style.position = 'absolute';
-        labelRenderer.domElement.style.top = '0';
-        labelRenderer.domElement.style.left = '0';
-        labelRenderer.domElement.style.pointerEvents = 'none';
-        container.appendChild(labelRenderer.domElement);
-
         const controls = new OrbitControls(camera, renderer.domElement);
         controls.enableDamping = true;
         controls.dampingFactor = 0.08;
-        controls.screenSpacePanning = true;
-       
+        controls.maxPolarAngle = Math.PI / 2.1;
+        controls.minDistance = 3;
+        controls.maxDistance = 100;
+        controls.target.set(0, 1, 0);
+
+        // --- LIGHTING ---
+        scene.add(new THREE.AmbientLight(0x334466, 0.6));
+        const sun = new THREE.DirectionalLight(0xffeedd, 1.0);
+        sun.position.set(30, 40, 20);
+        sun.castShadow = true;
+        sun.shadow.mapSize.width = 512;
+        sun.shadow.mapSize.height = 512;
+        sun.shadow.camera.near = 0.5;
+        sun.shadow.camera.far = 100;
+        sun.shadow.camera.left = -50;
+        sun.shadow.camera.right = 50;
+        sun.shadow.camera.top = 50;
+        sun.shadow.camera.bottom = -50;
+        scene.add(sun);
+        scene.add(new THREE.HemisphereLight(0x445566, 0x221100, 0.5));
+
+        // --- GROUND ---
+        const ground = new THREE.Mesh(
+            new THREE.PlaneGeometry(150, 150),
+            new THREE.MeshStandardMaterial({ color: 0x141a24, roughness: 0.9, metalness: 0.1 })
+        );
+        ground.rotation.x = -Math.PI / 2;
+        ground.position.y = -0.2;
+        ground.receiveShadow = true;
+        scene.add(ground);
+
+        const grid = new THREE.GridHelper(100, 20, 0x2a3a5a, 0x1a2a3a);
+        grid.position.y = -0.1;
+        scene.add(grid);
+
+        // --- OCEAN (Simple but beautiful) ---
+        const oceanGeo = new THREE.PlaneGeometry(150, 150, 80, 80);
+        oceanGeo.rotateX(-Math.PI / 2);
+
+        const oceanMat = new THREE.ShaderMaterial({
+            uniforms: {
+                time: { value: 0 },
+                waveHeight: { value: 0.5 },
+                waveSpeed: { value: 1.0 },
+            },
+            vertexShader: `
+                uniform float time;
+                uniform float waveHeight;
+                uniform float waveSpeed;
+                varying float vHeight;
+                varying vec3 vNormal;
+
+                void main() {
+                    vec3 pos = position;
+                    float h = 0.0;
+                    for(float i=0.0; i<6.0; i++){
+                        float f = 0.5 + i*0.4;
+                        float a = waveHeight * (0.4 + 0.6*sin(i*2.1));
+                        float s = waveSpeed * (0.7 + i*0.15);
+                        float ang = i*1.3 + 0.7;
+                        vec2 d = vec2(cos(ang), sin(ang));
+                        float w = sin(dot(pos.xz, d)*f + time*s);
+                        h += w*a;
+                    }
+                    h *= 0.6;
+                    pos.y += h;
+                    vHeight = h;
+                    vec3 n = normalize(vec3(0.0, 1.0, 0.0));
+                    vNormal = n;
+                    gl_Position = projectionMatrix * modelViewMatrix * vec4(pos, 1.0);
+                }
+            `,
+            fragmentShader: `
+                uniform float waveHeight;
+                varying float vHeight;
+
+                void main() {
+                    float h = vHeight / max(waveHeight, 0.1);
+                    vec3 deep = vec3(0.0, 0.1, 0.25);
+                    vec3 shallow = vec3(0.0, 0.4, 0.6);
+                    vec3 color = mix(deep, shallow, 0.5 + h*0.5);
+                    float foam = smoothstep(0.3, 0.7, h) * 0.3;
+                    color += vec3(0.8, 0.9, 1.0) * foam;
+                    float spec = pow(max(h, 0.0), 8.0) * 0.2;
+                    color += vec3(1.0) * spec;
+                    gl_FragColor = vec4(color, 0.8);
+                }
+            `,
+            transparent: true,
+            side: THREE.DoubleSide,
+        });
+
+        const ocean = new THREE.Mesh(oceanGeo, oceanMat);
+        ocean.position.y = -0.15;
+        scene.add(ocean);
+
+        // --- LANDMARKS ---
+        const landmarks = [
+            { name: 'Eiffel Tower', pos: [-10, 0, -6], color: 0x7a5a3a, h: 5 },
+            { name: 'Statue Liberty', pos: [8, 0, -4], color: 0x6a9a6a, h: 4 },
+            { name: 'Big Ben', pos: [-4, 0, 12], color: 0x8a7a5a, h: 4.5 },
+            { name: 'Colosseum', pos: [12, 0, 8], color: 0x9a7a5a, h: 3 },
+            { name: 'Opera House', pos: [-12, 0, 14], color: 0x7a9aaa, h: 3.5 },
+            { name: 'Taj Mahal', pos: [6, 0, -14], color: 0xdaaa7a, h: 5 },
+            { name: 'Pyramid', pos: [-16, 0, -16], color: 0x8a7a5a, h: 6 },
+            { name: 'Burj Khalifa', pos: [18, 0, -18], color: 0x6a8a9a, h: 8 },
+        ];
+
+        const objects = [];
+        const labels = [];
+
+        function createLandmark(data) {
+            const g = new THREE.Group();
+            const h = data.h;
+            const col = new THREE.Color(data.color);
+
+            // Base
+            const base = new THREE.Mesh(
+                new THREE.BoxGeometry(1.6, 0.3, 1.6),
+                new THREE.MeshStandardMaterial({ color: col, roughness: 0.5, metalness: 0.2 })
+            );
+            base.position.y = 0.15;
+            base.castShadow = true;
+            g.add(base);
+
+            // Body
+            const body = new THREE.Mesh(
+                new THREE.CylinderGeometry(0.6, 0.9, h, 6),
+                new THREE.MeshStandardMaterial({ color: col, roughness: 0.4, metalness: 0.3 })
+            );
+            body.position.y = 0.3 + h / 2;
+            body.castShadow = true;
+            g.add(body);
+
+            // Top
+            const top = new THREE.Mesh(
+                new THREE.SphereGeometry(0.3, 6, 6),
+                new THREE.MeshStandardMaterial({ color: 0xffaa44, emissive: 0xff5500, emissiveIntensity: 0.2 })
+            );
+            top.position.y = 0.3 + h + 0.2;
+            g.add(top);
+
+            g.position.set(data.pos[0], -0.15, data.pos[2]);
+            g.userData = { name: data.name, height: h, color: data.color };
+            scene.add(g);
+            objects.push(g);
+
+            // Label (HTML)
+            const div = document.createElement('div');
+            div.textContent = data.name;
+            div.style.cssText =
+                'color:#dde;font-size:11px;font-weight:400;text-shadow:0 2px 20px rgba(0,0,0,0.9);background:rgba(10,14,23,0.6);padding:2px 12px;border-radius:12px;backdrop-filter:blur(4px);border:1px solid rgba(255,255,255,0.05);pointer-events:none;';
+            const label = new THREE.CSS2DObject(div);
+            label.position.set(data.pos[0], h + 1.5, data.pos[2]);
+            scene.add(label);
+            labels.push(label);
+        }
+
+        landmarks.forEach(createLandmark);
+
+        // --- SIMULATION ENGINE ---
+        const sim = {
+            traffic: { enabled: true, data: {} },
+            population: { enabled: true, data: {} },
+            weather: { enabled: false, data: {} },
+            growth: { enabled: false, data: {} },
+            paused: false,
+            time: 0,
+            landmarkData: landmarks.map(l => ({ ...l, pop: 100 + Math.random() * 900, traffic: 10 + Math.random() * 90 })),
+
+            update(dt) {
+                if (this.paused) return;
+                this.time += dt;
+
+                if (this.traffic.enabled) {
+                    this.landmarkData.forEach((l, i) => {
+                        l.traffic = 20 + 60 * (0.5 + 0.5 * Math.sin(i + this.time * 0.08));
+                    });
+                    this.traffic.data.avg = this.landmarkData.reduce((s, l) => s + l.traffic, 0) / this.landmarkData
+                    .length;
+                }
+
+                if (this.population.enabled) {
+                    this.landmarkData.forEach((l) => {
+                        l.pop += l.pop * 0.001 * (1 - l.pop / 3000) * dt * 10;
+                        l.pop = Math.max(50, Math.min(3500, l.pop));
+                    });
+                    this.population.data.total = this.landmarkData.reduce((s, l) => s + l.pop, 0);
+                }
+
+                if (this.growth.enabled) {
+                    this.landmarkData.forEach((l, i) => {
+                        l.h += 0.001 * dt * 5;
+                        l.h = Math.min(20, l.h);
+                        // Update 3D object
+                        if (objects[i]) {
+                            const body = objects[i].children[1];
+                            if (body) {
+                                body.scale.y = l.h / landmarks[i].h;
+                                body.position.y = 0.3 + l.h / 2;
+                            }
+                            const top = objects[i].children[2];
+                            if (top) {
+                                top.position.y = 0.3 + l.h + 0.2;
+                            }
+                            // Update label
+                            if (labels[i]) {
+                                labels[i].position.y = l.h + 1.5;
+                            }
+                        }
+                    });
+                    this.growth.data.avgHeight = this.landmarkData.reduce((s, l) => s + l.h, 0) / this.landmarkData.length;
+                }
+            },
+
+            toggle(name) {
+                this[name].enabled = !this[name].enabled;
+                return this[name].enabled;
+            },
+
+            togglePause() {
+                this.paused = !this.paused;
+                return this.paused;
+            },
+
+            reset() {
+                this.landmarkData.forEach((l, i) => {
+                    l.pop = 100 + Math.random() * 900;
+                    l.traffic = 10 + Math.random() * 90;
+                    l.h = landmarks[i].h;
+                    if (objects[i]) {
+                        const body = objects[i].children[1];
+                        if (body) body.scale.y = 1;
+                        const top = objects[i].children[2];
+                        if (top) top.position.y = 0.3 + l.h + 0.2;
+                        if (labels[i]) labels[i].position.y = l.h + 1.5;
+                    }
+                });
+                this.time = 0;
+            }
+        };
+
+        // --- INTERACTION ---
+        const raycaster = new THREE.Raycaster();
+        const pointer = new THREE.Vector2();
+        let selected = null;
+        let tool = 'select';
+
+        renderer.domElement.addEventListener('click', (e) => {
+            const rect = renderer.domElement.getBoundingClientRect();
+            pointer.x = ((e.clientX - rect.left) / rect.width) * 2 - 1;
+            pointer.y = -((e.clientY - rect.top) / rect.height) * 2 + 1;
+            raycaster.setFromCamera(pointer, camera);
+
+            const meshes = [];
+            objects.forEach(g => g.children.forEach(c => { if (c.isMesh) meshes.push(c); }));
+            const hits = raycaster.intersectObjects(meshes);
+            if (hits.length > 0) {
+                let g = hits[0].object.parent;
+                while (g && !objects.includes(g)) g = g.parent;
+                if (g) {
+                    document.getElementById('selected-label').textContent = g.userData.name || 'Landmark';
+                    selected = g;
+                    return;
+                }
+            }
+            document.getElementById('selected-label').textContent = '—';
+            selected = null;
+        });
+
+        // --- UI CONTROLS ---
+        document.querySelectorAll('[data-tool]').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('[data-tool]').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                tool = btn.dataset.tool;
+            });
+        });
+
+        document.getElementById('height-slider').addEventListener('input', (e) => {
+            const v = parseFloat(e.target.value);
+            document.getElementById('h-val').textContent = v.toFixed(1);
+            ocean.material.uniforms.waveHeight.value = v;
+            document.getElementById('wave-height').textContent = v.toFixed(1) + 'm';
+            const state = v < 0.3 ? '🌊 calm' : v < 0.6 ? '🌊 moderate' : v < 1.2 ? '🌊 rough' : '🌊 stormy';
+            document.getElementById('ocean-state').textContent = state;
+        });
+
+        document.getElementById('speed-slider').addEventListener('input', (e) => {
+            const v = parseFloat(e.target.value);
+            document.getElementById('s-val').textContent = v.toFixed(1);
+            ocean.material.uniforms.waveSpeed.value = v;
+        });
+
+        document.getElementById('toggle-ocean').addEventListener('click', () => {
+            ocean.visible = !ocean.visible;
+            document.getElementById('toggle-ocean').textContent = ocean.visible ? '⏸️ Pause' : '▶️ Play';
+        });
+
+        document.getElementById('ocean-btn').addEventListener('click', () => {
+            ocean.visible = !ocean.visible;
+            document.getElementById('ocean-btn').classList.toggle('active');
+        });
+
+        document.getElementById('pause-sims').addEventListener('click', () => {
+            const paused = sim.togglePause();
+            document.getElementById('pause-sims').textContent = paused ? '▶️ Sims' : '⏸️ Sims';
+            document.getElementById('sim-status').textContent = paused ? '● paused' : '● running';
+        });
+
+        ['traffic', 'population', 'weather', 'growth'].forEach(name => {
+            document.getElementById(`sim-${name}`).addEventListener('change', (e) => {
+                sim.toggle(name);
+                document.getElementById(`dot-${name}`).className = 'dot' + (e.target.checked ? '' : ' paused');
+            });
+        });
+
+        document.getElementById('reset-btn').addEventListener('click', () => {
+            sim.reset();
+            // Reset ocean
+            document.getElementById('height-slider').value = 0.5;
+            document.getElementById('h-val').textContent = '0.5';
+            ocean.material.uniforms.waveHeight.value = 0.5;
+            document.getElementById('wave-height').textContent = '0.5m';
+            document.getElementById('ocean-state').textContent = '🌊 calm';
+        });
+
+        document.getElementById('save-btn').addEventListener('click', () => {
+            const data = sim.landmarkData.map(l => ({
+                name: l.name,
+                population: Math.round(l.pop),
+                traffic: Math.round(l.traffic),
+                height: l.h.toFixed(2)
+            }));
+            const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'atlas_data.json';
+            a.click();
+        });
+
+        // --- ANIMATION ---
+        let lastTime = 0;
+
+        function animate(time) {
+            const dt = Math.min((time - lastTime) / 1000, 0.05);
+            lastTime = time;
+
+            ocean.material.uniforms.time.value += dt * ocean.material.uniforms.waveSpeed.value;
+            sim.update(dt);
+
+            controls.update();
+            renderer.render(scene, camera);
+            requestAnimationFrame(animate);
+        }
+
+        // --- RESIZE ---
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        });
+
+        animate(0);
+
+        console.log('🌊 Atlas Ready!');
+    </script>
+</body>
+</html>
