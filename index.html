@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Atlas - Real-time 3D World Editor + Ocean + Simulations</title>
+    <title>Atlas - Ocean & Simulation Engine</title>
     <style>
         * {
             margin: 0;
@@ -55,26 +55,26 @@
             left: 50%;
             transform: translateX(-50%);
             display: flex;
-            gap: 8px;
+            gap: 6px;
             background: rgba(18, 22, 30, 0.85);
             backdrop-filter: blur(16px);
-            padding: 12px 20px;
-            border-radius: 60px;
+            padding: 10px 16px;
+            border-radius: 50px;
             border: 1px solid rgba(255, 255, 255, 0.06);
             box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6);
             pointer-events: auto;
             z-index: 20;
             flex-wrap: wrap;
             justify-content: center;
-            max-width: 95vw;
+            max-width: 98vw;
         }
         .tool-btn {
             background: transparent;
             border: none;
             color: #aab;
-            padding: 6px 14px;
-            border-radius: 40px;
-            font-size: 0.8rem;
+            padding: 5px 12px;
+            border-radius: 30px;
+            font-size: 0.75rem;
             font-weight: 500;
             cursor: pointer;
             transition: all 0.2s;
@@ -94,12 +94,6 @@
             box-shadow: 0 0 20px rgba(42, 125, 225, 0.3);
             border-color: #2a7de1;
         }
-        .tool-btn.sim-active {
-            background: #e17d2a;
-            color: white;
-            box-shadow: 0 0 20px rgba(225, 125, 42, 0.3);
-            border-color: #e17d2a;
-        }
         .tool-btn.primary {
             background: #1f8b4c;
             color: white;
@@ -113,14 +107,6 @@
         }
         .tool-btn.danger:hover {
             background: #d14a4a;
-        }
-        .tool-btn.sim-btn {
-            background: rgba(42, 125, 225, 0.15);
-            color: #6af;
-            border-color: rgba(42, 125, 225, 0.2);
-        }
-        .tool-btn.sim-btn:hover {
-            background: rgba(42, 125, 225, 0.25);
         }
         .tool-btn.ocean-btn {
             background: rgba(0, 150, 255, 0.15);
@@ -136,104 +122,108 @@
             box-shadow: 0 0 20px rgba(0, 119, 190, 0.3);
             border-color: #0077be;
         }
+        .tool-btn.sim-btn {
+            background: rgba(42, 125, 225, 0.15);
+            color: #6af;
+            border-color: rgba(42, 125, 225, 0.2);
+        }
+        .tool-btn.sim-btn:hover {
+            background: rgba(42, 125, 225, 0.25);
+        }
+        .tool-btn.sim-active {
+            background: #e17d2a;
+            color: white;
+            box-shadow: 0 0 20px rgba(225, 125, 42, 0.3);
+            border-color: #e17d2a;
+        }
 
         #info-panel {
             position: absolute;
             bottom: 120px;
-            right: 30px;
-            background: rgba(11, 14, 20, 0.8);
+            right: 20px;
+            background: rgba(11, 14, 20, 0.85);
             backdrop-filter: blur(12px);
-            padding: 18px 22px;
-            border-radius: 16px;
+            padding: 14px 18px;
+            border-radius: 14px;
             border: 1px solid rgba(255, 255, 255, 0.06);
-            font-size: 0.8rem;
-            min-width: 200px;
+            font-size: 0.75rem;
+            min-width: 160px;
             pointer-events: none;
             z-index: 15;
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
-            max-height: 60vh;
-            overflow-y: auto;
         }
         #info-panel .label {
-            opacity: 0.5;
-            font-size: 0.65rem;
+            opacity: 0.4;
+            font-size: 0.6rem;
             text-transform: uppercase;
             letter-spacing: 1px;
         }
         #info-panel .value {
-            font-size: 0.95rem;
+            font-size: 0.85rem;
             font-weight: 400;
-            margin-top: 4px;
-            font-variant-numeric: tabular-nums;
+            margin-top: 2px;
         }
         #info-panel .row {
-            margin-bottom: 8px;
+            margin-bottom: 6px;
         }
         #info-panel .row:last-child {
             margin-bottom: 0;
         }
-        #info-panel .sim-status {
-            color: #6f8;
-        }
-        #info-panel .sim-data {
-            font-size: 0.75rem;
-            opacity: 0.8;
-            margin-top: 2px;
-        }
-        #info-panel .ocean-data {
+        .ocean-data {
             color: #4af;
+        }
+        .sim-status {
+            color: #6f8;
         }
 
         #sim-controls {
             position: absolute;
             top: 80px;
-            right: 30px;
-            background: rgba(11, 14, 20, 0.8);
+            right: 20px;
+            background: rgba(11, 14, 20, 0.85);
             backdrop-filter: blur(12px);
-            padding: 16px 20px;
-            border-radius: 16px;
+            padding: 14px 16px;
+            border-radius: 14px;
             border: 1px solid rgba(255, 255, 255, 0.06);
             z-index: 15;
-            min-width: 180px;
+            min-width: 150px;
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
             pointer-events: auto;
-            max-height: 70vh;
-            overflow-y: auto;
         }
         #sim-controls h4 {
             font-weight: 400;
-            font-size: 0.8rem;
-            opacity: 0.7;
-            margin-bottom: 10px;
+            font-size: 0.7rem;
+            opacity: 0.6;
+            margin-bottom: 8px;
             letter-spacing: 1px;
         }
         .sim-toggle {
             display: flex;
             align-items: center;
-            gap: 10px;
-            padding: 6px 0;
+            gap: 8px;
+            padding: 4px 0;
             cursor: pointer;
             transition: 0.2s;
-            border-radius: 8px;
-            padding: 6px 10px;
+            border-radius: 6px;
+            padding: 4px 8px;
         }
         .sim-toggle:hover {
             background: rgba(255, 255, 255, 0.05);
         }
         .sim-toggle input[type="checkbox"] {
             accent-color: #2a7de1;
-            width: 16px;
-            height: 16px;
+            width: 14px;
+            height: 14px;
             cursor: pointer;
         }
         .sim-toggle label {
-            font-size: 0.75rem;
+            font-size: 0.7rem;
             cursor: pointer;
             flex: 1;
         }
         .sim-toggle .indicator {
-            width: 8px;
-            height: 8px;
+            width: 6px;
+            height: 6px;
             border-radius: 50%;
             background: #4a4;
             transition: 0.3s;
@@ -245,35 +235,51 @@
         #ocean-controls {
             position: absolute;
             top: 80px;
-            left: 30px;
-            background: rgba(11, 14, 20, 0.8);
+            left: 20px;
+            background: rgba(11, 14, 20, 0.85);
             backdrop-filter: blur(12px);
-            padding: 16px 20px;
-            border-radius: 16px;
+            padding: 14px 16px;
+            border-radius: 14px;
             border: 1px solid rgba(255, 255, 255, 0.06);
             z-index: 15;
-            min-width: 150px;
+            min-width: 140px;
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
             pointer-events: auto;
         }
         #ocean-controls h4 {
             font-weight: 400;
-            font-size: 0.8rem;
-            opacity: 0.7;
-            margin-bottom: 10px;
+            font-size: 0.7rem;
+            opacity: 0.6;
+            margin-bottom: 8px;
             letter-spacing: 1px;
             color: #4af;
         }
         .ocean-slider {
             width: 100%;
-            margin: 6px 0;
+            margin: 4px 0;
             accent-color: #0077be;
+            height: 4px;
         }
         .ocean-slider-label {
             display: flex;
             justify-content: space-between;
-            font-size: 0.7rem;
-            opacity: 0.6;
+            font-size: 0.6rem;
+            opacity: 0.5;
+        }
+        .ocean-control-btn {
+            background: rgba(0, 150, 255, 0.1);
+            border: 1px solid rgba(0, 150, 255, 0.2);
+            color: #4af;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.65rem;
+            cursor: pointer;
+            transition: 0.2s;
+            margin-top: 6px;
+            width: 100%;
+        }
+        .ocean-control-btn:hover {
+            background: rgba(0, 150, 255, 0.2);
         }
 
         #loading {
@@ -291,31 +297,17 @@
             border: 1px solid rgba(255, 255, 255, 0.05);
         }
 
-        #info-panel::-webkit-scrollbar,
-        #sim-controls::-webkit-scrollbar {
-            width: 4px;
-        }
-        #info-panel::-webkit-scrollbar-track,
-        #sim-controls::-webkit-scrollbar-track {
-            background: transparent;
-        }
-        #info-panel::-webkit-scrollbar-thumb,
-        #sim-controls::-webkit-scrollbar-thumb {
-            background: rgba(255, 255, 255, 0.2);
-            border-radius: 10px;
-        }
-
         @media (max-width: 700px) {
             #toolbar {
-                bottom: 20px;
-                padding: 8px 12px;
-                gap: 4px;
-                border-radius: 30px;
+                bottom: 10px;
+                padding: 6px 10px;
+                gap: 3px;
+                border-radius: 20px;
                 width: 98%;
             }
             .tool-btn {
-                font-size: 0.65rem;
-                padding: 4px 10px;
+                font-size: 0.6rem;
+                padding: 3px 8px;
             }
             #info-panel,
             #sim-controls,
@@ -323,20 +315,20 @@
                 display: none;
             }
             #hud h1 {
-                font-size: 1.1rem;
+                font-size: 1rem;
             }
         }
     </style>
 </head>
 <body>
 
-    <div id="loading">Initializing Atlas Ocean Simulation...</div>
+    <div id="loading">🌊 Initializing Atlas Ocean Simulation...</div>
 
     <div id="canvas-container"></div>
 
     <div id="hud">
-        <h1>🌊 Atlas · Ocean & Simulation Engine</h1>
-        <div class="sub">real-time 3D · dynamic ocean · multi-simulation</div>
+        <h1>🌊 Atlas · Ocean Engine</h1>
+        <div class="sub">real-time 3D · dynamic waves · multi-simulation</div>
     </div>
 
     <div id="info-panel">
@@ -349,54 +341,44 @@
             <div class="value" id="coord-label">—</div>
         </div>
         <div class="row">
-            <div class="label">Simulation</div>
-            <div class="value sim-status" id="sim-status">● idle</div>
-        </div>
-        <div class="row">
-            <div class="label">Active Sims</div>
-            <div class="value sim-data" id="sim-count">0 / 4</div>
-        </div>
-        <div class="row">
             <div class="label">Ocean State</div>
             <div class="value ocean-data" id="ocean-state">🌊 calm</div>
         </div>
         <div class="row">
             <div class="label">Wave Height</div>
-            <div class="value ocean-data" id="wave-height">0.5 m</div>
+            <div class="value ocean-data" id="wave-height">1.0 m</div>
         </div>
         <div class="row">
-            <div class="label">Sim Data</div>
-            <div class="value sim-data" id="sim-data">—</div>
+            <div class="label">Sim Status</div>
+            <div class="value sim-status" id="sim-status">● running</div>
         </div>
     </div>
 
     <div id="ocean-controls">
-        <h4>🌊 OCEAN CONTROLS</h4>
+        <h4>🌊 OCEAN</h4>
         <div class="ocean-slider-label">
-            <span>Wave Height</span>
+            <span>Height</span>
             <span id="wave-slider-value">0.5</span>
         </div>
         <input type="range" class="ocean-slider" id="wave-height-slider" min="0" max="2" step="0.1" value="0.5" />
-        <div class="ocean-slider-label" style="margin-top:8px;">
-            <span>Wave Speed</span>
+        <div class="ocean-slider-label" style="margin-top:6px;">
+            <span>Speed</span>
             <span id="speed-slider-value">1.0</span>
         </div>
         <input type="range" class="ocean-slider" id="wave-speed-slider" min="0.1" max="3" step="0.1" value="1.0" />
-        <div class="ocean-slider-label" style="margin-top:8px;">
-            <span>Foam Intensity</span>
+        <div class="ocean-slider-label" style="margin-top:6px;">
+            <span>Foam</span>
             <span id="foam-slider-value">0.5</span>
         </div>
         <input type="range" class="ocean-slider" id="foam-slider" min="0" max="1" step="0.05" value="0.5" />
-        <button class="tool-btn ocean-btn" id="toggle-ocean-btn" style="margin-top:10px;width:100%;text-align:center;">
-            🌊 Toggle Waves
-        </button>
+        <button class="ocean-control-btn" id="toggle-ocean-btn">⏸️ Pause Waves</button>
     </div>
 
     <div id="sim-controls">
-        <h4>⚙️ SIMULATION CONTROLS</h4>
+        <h4>⚙️ SIMULATIONS</h4>
         <div class="sim-toggle">
             <input type="checkbox" id="sim-traffic" checked />
-            <label for="sim-traffic">🚗 Traffic Flow</label>
+            <label for="sim-traffic">🚗 Traffic</label>
             <span class="indicator" id="ind-traffic"></span>
         </div>
         <div class="sim-toggle">
@@ -411,13 +393,10 @@
         </div>
         <div class="sim-toggle">
             <input type="checkbox" id="sim-growth" />
-            <label for="sim-growth">📈 Urban Growth</label>
+            <label for="sim-growth">📈 Growth</label>
             <span class="indicator" id="ind-growth"></span>
         </div>
-        <div style="margin-top:10px;display:flex;gap:6px;flex-wrap:wrap;">
-            <button class="tool-btn primary" id="sim-reset" style="font-size:0.7rem;padding:4px 12px;">↺ Reset Sims</button>
-            <button class="tool-btn" id="sim-export" style="font-size:0.7rem;padding:4px 12px;">📊 Export Data</button>
-        </div>
+        <button class="ocean-control-btn" id="sim-reset-btn" style="margin-top:8px;">↺ Reset All</button>
     </div>
 
     <div id="toolbar">
@@ -428,10 +407,9 @@
         <button class="tool-btn primary" id="save-btn">💾 Save</button>
         <button class="tool-btn danger" id="reset-btn">↺ Reset</button>
         <button class="tool-btn sim-btn" id="toggle-sim-btn">⏸️ Pause Sims</button>
-        <button class="tool-btn ocean-btn" id="toggle-ocean-btn2">🌊 Ocean</button>
+        <button class="tool-btn ocean-btn active" id="toggle-ocean-btn2">🌊 Ocean</button>
     </div>
 
-    <!-- Import maps and scripts -->
     <script type="importmap">
         {
             "imports": {
@@ -445,303 +423,6 @@
         import * as THREE from 'three';
         import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
         import { CSS2DRenderer, CSS2DObject } from 'three/addons/renderers/CSS2DRenderer.js';
-
-        // --- OCEAN SYSTEM ---
-        class OceanSystem {
-            constructor(scene, simEngine) {
-                this.scene = scene;
-                this.simEngine = simEngine;
-                this.waveHeight = 0.5;
-                this.waveSpeed = 1.0;
-                this.foamIntensity = 0.5;
-                this.enabled = true;
-                this.time = 0;
-                this.waveCount = 8;
-                this.segments = 128;
-
-                this.createOcean();
-                this.createReflection();
-                this.createParticles();
-            }
-
-            createOcean() {
-                // Main ocean plane with vertex displacement
-                const geometry = new THREE.PlaneGeometry(200, 200, this.segments, this.segments);
-                geometry.rotateX(-Math.PI / 2);
-
-                // Store original positions for wave calculation
-                const positions = geometry.attributes.position.array;
-                this.originalPositions = new Float32Array(positions);
-
-                const material = new THREE.ShaderMaterial({
-                    uniforms: {
-                        time: { value: 0 },
-                        waveHeight: { value: this.waveHeight },
-                        waveSpeed: { value: this.waveSpeed },
-                        foamIntensity: { value: this.foamIntensity },
-                        waterColor: { value: new THREE.Color(0x006994) },
-                        deepColor: { value: new THREE.Color(0x001a33) },
-                        foamColor: { value: new THREE.Color(0xffffff) },
-                    },
-                    vertexShader: `
-                        uniform float time;
-                        uniform float waveHeight;
-                        uniform float waveSpeed;
-
-                        varying float vHeight;
-                        varying vec2 vUv;
-                        varying vec3 vNormal;
-
-                        void main() {
-                            vUv = uv;
-                            vec3 pos = position;
-
-                            // Multiple wave system
-                            float h = 0.0;
-                            float waveCount = 8.0;
-                            for (float i = 0.0; i < 8.0; i++) {
-                                float freq = 0.5 + i * 0.3;
-                                float amp = waveHeight * (0.5 + 0.5 * sin(i * 1.7));
-                                float speed = waveSpeed * (0.8 + i * 0.1);
-                                float angle = i * 1.2 + 0.5;
-                                vec2 dir = vec2(cos(angle), sin(angle));
-                                float wave = sin(dot(pos.xz, dir) * freq + time * speed);
-                                h += wave * amp;
-                            }
-                            h /= 2.0;
-
-                            pos.y += h;
-                            vHeight = h;
-
-                            // Approximate normal
-                            float eps = 0.1;
-                            float hx = 0.0;
-                            float hz = 0.0;
-                            for (float i = 0.0; i < 8.0; i++) {
-                                float freq = 0.5 + i * 0.3;
-                                float amp = waveHeight * (0.5 + 0.5 * sin(i * 1.7));
-                                float speed = waveSpeed * (0.8 + i * 0.1);
-                                float angle = i * 1.2 + 0.5;
-                                vec2 dir = vec2(cos(angle), sin(angle));
-                                float wave = sin(dot(pos.xz, dir) * freq + time * speed);
-                                hx += wave * amp * freq * dir.x;
-                                hz += wave * amp * freq * dir.y;
-                            }
-                            hx /= 2.0;
-                            hz /= 2.0;
-                            vec3 normal = normalize(vec3(-hx, 1.0, -hz));
-                            vNormal = normal;
-
-                            gl_Position = projectionMatrix * modelViewMatrix * vec4(pos, 1.0);
-                        }
-                    `,
-                    fragmentShader: `
-                        uniform vec3 waterColor;
-                        uniform vec3 deepColor;
-                        uniform vec3 foamColor;
-                        uniform float foamIntensity;
-                        uniform float waveHeight;
-
-                        varying float vHeight;
-                        varying vec2 vUv;
-                        varying vec3 vNormal;
-
-                        void main() {
-                            // Fresnel effect
-                            vec3 viewDir = vec3(0.0, 1.0, 0.0);
-                            float fresnel = 1.0 - max(dot(viewDir, vNormal), 0.0);
-                            fresnel = pow(fresnel, 3.0);
-
-                            // Depth color based on wave height
-                            float depthFactor = 0.5 + 0.5 * vHeight / max(waveHeight, 0.1);
-                            vec3 color = mix(deepColor, waterColor, depthFactor);
-
-                            // Foam on wave crests
-                            float foam = smoothstep(0.3, 0.7, vHeight / max(waveHeight, 0.1));
-                            foam *= foamIntensity;
-                            color = mix(color, foamColor, foam * 0.5);
-
-                            // Specular highlights
-                            float spec = pow(max(dot(vNormal, viewDir), 0.0), 32.0);
-                            color += vec3(1.0, 1.0, 0.8) * spec * 0.3;
-
-                            // Fresnel reflection
-                            color += vec3(0.4, 0.6, 0.8) * fresnel * 0.3;
-
-                            gl_FragColor = vec4(color, 0.85);
-                        }
-                    `,
-                    transparent: true,
-                    side: THREE.DoubleSide,
-                    wireframe: false,
-                });
-
-                this.oceanMesh = new THREE.Mesh(geometry, material);
-                this.oceanMesh.position.y = -0.3;
-                this.oceanMesh.receiveShadow = true;
-                this.scene.add(this.oceanMesh);
-            }
-
-            createReflection() {
-                // Simple reflection sphere for sky/clouds
-                const skyGeo = new THREE.SphereGeometry(150, 32, 32);
-                const skyMat = new THREE.ShaderMaterial({
-                    uniforms: {
-                        time: { value: 0 },
-                    },
-                    vertexShader: `
-                        varying vec3 vPosition;
-                        void main() {
-                            vPosition = position;
-                            gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
-                        }
-                    `,
-                    fragmentShader: `
-                        uniform float time;
-                        varying vec3 vPosition;
-
-                        void main() {
-                            vec3 pos = normalize(vPosition);
-                            float cloud = sin(pos.x * 5.0 + time * 0.02) * cos(pos.z * 7.0 + time * 0.015) * 0.5 + 0.5;
-                            cloud *= sin(pos.y * 8.0 + time * 0.01) * 0.5 + 0.5;
-                            vec3 color = mix(vec3(0.1, 0.2, 0.4), vec3(0.6, 0.7, 0.9), cloud * 0.5);
-                            // Gradient
-                            float gradient = 0.5 + 0.5 * pos.y;
-                            color = mix(vec3(0.05, 0.1, 0.2), color, gradient);
-                            gl_FragColor = vec4(color, 0.3);
-                        }
-                    `,
-                    transparent: true,
-                    side: THREE.BackSide,
-                });
-                this.skySphere = new THREE.Mesh(skyGeo, skyMat);
-                this.skySphere.position.y = 30;
-                this.scene.add(this.skySphere);
-            }
-
-            createParticles() {
-                // Foam/spray particles
-                const particleCount = 500;
-                const geometry = new THREE.BufferGeometry();
-                const positions = new Float32Array(particleCount * 3);
-                const velocities = new Float32Array(particleCount * 3);
-                const lifetimes = new Float32Array(particleCount);
-
-                for (let i = 0; i < particleCount; i++) {
-                    positions[i * 3] = (Math.random() - 0.5) * 160;
-                    positions[i * 3 + 1] = Math.random() * 2 - 0.5;
-                    positions[i * 3 + 2] = (Math.random() - 0.5) * 160;
-                    velocities[i * 3] = (Math.random() - 0.5) * 0.5;
-                    velocities[i * 3 + 1] = Math.random() * 0.5 + 0.1;
-                    velocities[i * 3 + 2] = (Math.random() - 0.5) * 0.5;
-                    lifetimes[i] = Math.random() * 10;
-                }
-
-                geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
-                geometry.setAttribute('lifetime', new THREE.BufferAttribute(lifetimes, 1));
-
-                const material = new THREE.PointsMaterial({
-                    color: 0x88ccff,
-                    size: 0.3,
-                    transparent: true,
-                    opacity: 0.3,
-                    blending: THREE.AdditiveBlending,
-                    depthWrite: false,
-                });
-
-                this.particles = new THREE.Points(geometry, material);
-                this.scene.add(this.particles);
-                this.particleVelocities = velocities;
-                this.particleLife = lifetimes;
-            }
-
-            update(time, delta) {
-                if (!this.enabled) return;
-
-                this.time += delta * this.waveSpeed;
-
-                // Update ocean shader
-                if (this.oceanMesh) {
-                    this.oceanMesh.material.uniforms.time.value = this.time;
-                    this.oceanMesh.material.uniforms.waveHeight.value = this.waveHeight;
-                    this.oceanMesh.material.uniforms.waveSpeed.value = this.waveSpeed;
-                    this.oceanMesh.material.uniforms.foamIntensity.value = this.foamIntensity;
-                }
-
-                // Update sky
-                if (this.skySphere) {
-                    this.skySphere.material.uniforms.time.value = this.time;
-                    this.skySphere.rotation.y += delta * 0.001;
-                }
-
-                // Update particles
-                if (this.particles) {
-                    const positions = this.particles.geometry.attributes.position.array;
-                    for (let i = 0; i < positions.length / 3; i++) {
-                        // Wave influence
-                        const x = positions[i * 3];
-                        const z = positions[i * 3 + 2];
-                        const waveHeight = this.waveHeight * 0.5;
-                        const wave = Math.sin(x * 0.3 + this.time * 0.5) * Math.cos(z * 0.2 + this.time * 0.3) * waveHeight;
-
-                        positions[i * 3 + 1] += this.particleVelocities[i * 3 + 1] * delta * 0.5;
-
-                        // Reset if too high or low
-                        if (positions[i * 3 + 1] > 2 + wave || positions[i * 3 + 1] < -1) {
-                            positions[i * 3] = (Math.random() - 0.5) * 160;
-                            positions[i * 3 + 1] = -0.5 + Math.random() * 0.5;
-                            positions[i * 3 + 2] = (Math.random() - 0.5) * 160;
-                            this.particleVelocities[i * 3 + 1] = Math.random() * 0.3 + 0.1;
-                        }
-
-                        // Slight horizontal drift
-                        positions[i * 3] += this.particleVelocities[i * 3] * delta * 0.2;
-                        positions[i * 3 + 2] += this.particleVelocities[i * 3 + 2] * delta * 0.2;
-                    }
-                    this.particles.geometry.attributes.position.needsUpdate = true;
-                    this.particles.material.opacity = 0.15 + this.foamIntensity * 0.25;
-                }
-
-                // Update ocean state display
-                const state = this.getOceanState();
-                document.getElementById('ocean-state').textContent = state.emoji + ' ' + state.text;
-                document.getElementById('wave-height').textContent = (this.waveHeight * 2).toFixed(1) + ' m';
-            }
-
-            getOceanState() {
-                const h = this.waveHeight;
-                if (h < 0.3) return { emoji: '🌊', text: 'calm' };
-                if (h < 0.6) return { emoji: '🌊', text: 'moderate' };
-                if (h < 1.2) return { emoji: '🌊', text: 'rough' };
-                return { emoji: '🌊', text: 'stormy' };
-            }
-
-            setWaveHeight(value) {
-                this.waveHeight = Math.max(0, Math.min(2, value));
-                document.getElementById('wave-slider-value').textContent = this.waveHeight.toFixed(1);
-            }
-
-            setWaveSpeed(value) {
-                this.waveSpeed = Math.max(0.1, Math.min(3, value));
-                document.getElementById('speed-slider-value').textContent = this.waveSpeed.toFixed(1);
-            }
-
-            setFoam(value) {
-                this.foamIntensity = Math.max(0, Math.min(1, value));
-                document.getElementById('foam-slider-value').textContent = this.foamIntensity.toFixed(2);
-            }
-
-            toggle() {
-                this.enabled = !this.enabled;
-                if (this.oceanMesh) {
-                    this.oceanMesh.visible = this.enabled;
-                }
-                if (this.particles) {
-                    this.particles.visible = this.enabled;
-                }
-                return this.enabled;
-            }
-        }
 
         // --- SIMULATION ENGINE ---
         class SimulationEngine {
@@ -772,7 +453,6 @@
 
             update(deltaTime) {
                 if (this.paused) return;
-
                 this.simTime += deltaTime;
                 const sims = this.simulations;
 
@@ -833,4 +513,323 @@
                     });
                     sims.growth.data = {
                         avgHeight: this.landmarkData.reduce((s, l) => s + l.height, 0) / this.landmarkData.length,
-                        totalGrowth: this.landmarkData
+                        totalGrowth: this.landmarkData.reduce((s, l) => s + l.height - (l.originalHeight || 3), 0)
+                    };
+                }
+            }
+
+            getLandmarkData() {
+                return this.landmarkData;
+            }
+
+            togglePause() {
+                this.paused = !this.paused;
+                return this.paused;
+            }
+
+            toggleSim(name) {
+                if (this.simulations[name]) {
+                    this.simulations[name].enabled = !this.simulations[name].enabled;
+                    return this.simulations[name].enabled;
+                }
+                return false;
+            }
+
+            reset() {
+                this.landmarkData.forEach(l => {
+                    l.population = 100 + Math.random() * 900;
+                    l.traffic = 10 + Math.random() * 90;
+                    l.height = l.originalHeight || 3;
+                    l.temperature = 15 + Math.random() * 20;
+                    l.weather = 'clear';
+                });
+                this.simTime = 0;
+                this.history = [];
+                Object.keys(this.simulations).forEach(key => {
+                    this.simulations[key].tick = 0;
+                    this.simulations[key].data = {};
+                });
+            }
+        }
+
+        // --- OCEAN SYSTEM ---
+        class OceanSystem {
+            constructor(scene) {
+                this.scene = scene;
+                this.waveHeight = 0.5;
+                this.waveSpeed = 1.0;
+                this.foamIntensity = 0.5;
+                this.enabled = true;
+                this.time = 0;
+                this.segments = 128;
+
+                this.createOcean();
+                this.createParticles();
+                this.createSkyDome();
+            }
+
+            createOcean() {
+                const geometry = new THREE.PlaneGeometry(200, 200, this.segments, this.segments);
+                geometry.rotateX(-Math.PI / 2);
+
+                const material = new THREE.ShaderMaterial({
+                    uniforms: {
+                        time: { value: 0 },
+                        waveHeight: { value: this.waveHeight },
+                        waveSpeed: { value: this.waveSpeed },
+                        foamIntensity: { value: this.foamIntensity },
+                        waterColor: { value: new THREE.Color(0x006994) },
+                        deepColor: { value: new THREE.Color(0x001a33) },
+                        foamColor: { value: new THREE.Color(0xffffff) },
+                    },
+                    vertexShader: `
+                        uniform float time;
+                        uniform float waveHeight;
+                        uniform float waveSpeed;
+
+                        varying float vHeight;
+                        varying vec2 vUv;
+                        varying vec3 vNormal;
+
+                        void main() {
+                            vUv = uv;
+                            vec3 pos = position;
+
+                            float h = 0.0;
+                            for (float i = 0.0; i < 8.0; i++) {
+                                float freq = 0.5 + i * 0.3;
+                                float amp = waveHeight * (0.5 + 0.5 * sin(i * 1.7));
+                                float speed = waveSpeed * (0.8 + i * 0.1);
+                                float angle = i * 1.2 + 0.5;
+                                vec2 dir = vec2(cos(angle), sin(angle));
+                                float wave = sin(dot(pos.xz, dir) * freq + time * speed);
+                                h += wave * amp;
+                            }
+                            h /= 2.0;
+                            pos.y += h;
+                            vHeight = h;
+
+                            float eps = 0.1;
+                            float hx = 0.0;
+                            float hz = 0.0;
+                            for (float i = 0.0; i < 8.0; i++) {
+                                float freq = 0.5 + i * 0.3;
+                                float amp = waveHeight * (0.5 + 0.5 * sin(i * 1.7));
+                                float speed = waveSpeed * (0.8 + i * 0.1);
+                                float angle = i * 1.2 + 0.5;
+                                vec2 dir = vec2(cos(angle), sin(angle));
+                                float wave = sin(dot(pos.xz, dir) * freq + time * speed);
+                                hx += wave * amp * freq * dir.x;
+                                hz += wave * amp * freq * dir.y;
+                            }
+                            hx /= 2.0;
+                            hz /= 2.0;
+                            vec3 normal = normalize(vec3(-hx, 1.0, -hz));
+                            vNormal = normal;
+
+                            gl_Position = projectionMatrix * modelViewMatrix * vec4(pos, 1.0);
+                        }
+                    `,
+                    fragmentShader: `
+                        uniform vec3 waterColor;
+                        uniform vec3 deepColor;
+                        uniform vec3 foamColor;
+                        uniform float foamIntensity;
+                        uniform float waveHeight;
+
+                        varying float vHeight;
+                        varying vec2 vUv;
+                        varying vec3 vNormal;
+
+                        void main() {
+                            vec3 viewDir = vec3(0.0, 1.0, 0.0);
+                            float fresnel = 1.0 - max(dot(viewDir, vNormal), 0.0);
+                            fresnel = pow(fresnel, 3.0);
+
+                            float depthFactor = 0.5 + 0.5 * vHeight / max(waveHeight, 0.1);
+                            vec3 color = mix(deepColor, waterColor, depthFactor);
+
+                            float foam = smoothstep(0.3, 0.7, vHeight / max(waveHeight, 0.1));
+                            foam *= foamIntensity;
+                            color = mix(color, foamColor, foam * 0.5);
+
+                            float spec = pow(max(dot(vNormal, viewDir), 0.0), 32.0);
+                            color += vec3(1.0, 1.0, 0.8) * spec * 0.3;
+                            color += vec3(0.4, 0.6, 0.8) * fresnel * 0.3;
+
+                            gl_FragColor = vec4(color, 0.85);
+                        }
+                    `,
+                    transparent: true,
+                    side: THREE.DoubleSide,
+                });
+
+                this.oceanMesh = new THREE.Mesh(geometry, material);
+                this.oceanMesh.position.y = -0.3;
+                this.oceanMesh.receiveShadow = true;
+                this.scene.add(this.oceanMesh);
+            }
+
+            createParticles() {
+                const particleCount = 800;
+                const geometry = new THREE.BufferGeometry();
+                const positions = new Float32Array(particleCount * 3);
+                const velocities = new Float32Array(particleCount * 3);
+
+                for (let i = 0; i < particleCount; i++) {
+                    positions[i * 3] = (Math.random() - 0.5) * 160;
+                    positions[i * 3 + 1] = Math.random() * 2 - 0.5;
+                    positions[i * 3 + 2] = (Math.random() - 0.5) * 160;
+                    velocities[i * 3] = (Math.random() - 0.5) * 0.3;
+                    velocities[i * 3 + 1] = Math.random() * 0.3 + 0.1;
+                    velocities[i * 3 + 2] = (Math.random() - 0.5) * 0.3;
+                }
+
+                geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+
+                const material = new THREE.PointsMaterial({
+                    color: 0x88ccff,
+                    size: 0.2,
+                    transparent: true,
+                    opacity: 0.3,
+                    blending: THREE.AdditiveBlending,
+                    depthWrite: false,
+                });
+
+                this.particles = new THREE.Points(geometry, material);
+                this.scene.add(this.particles);
+                this.particleVelocities = velocities;
+            }
+
+            createSkyDome() {
+                const skyGeo = new THREE.SphereGeometry(150, 32, 32);
+                const skyMat = new THREE.ShaderMaterial({
+                    uniforms: {
+                        time: { value: 0 },
+                    },
+                    vertexShader: `
+                        varying vec3 vPosition;
+                        void main() {
+                            vPosition = position;
+                            gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+                        }
+                    `,
+                    fragmentShader: `
+                        uniform float time;
+                        varying vec3 vPosition;
+
+                        void main() {
+                            vec3 pos = normalize(vPosition);
+                            float cloud = sin(pos.x * 5.0 + time * 0.02) * cos(pos.z * 7.0 + time * 0.015) * 0.5 + 0.5;
+                            cloud *= sin(pos.y * 8.0 + time * 0.01) * 0.5 + 0.5;
+                            vec3 color = mix(vec3(0.05, 0.08, 0.15), vec3(0.3, 0.5, 0.8), cloud * 0.6 + 0.2);
+                            float gradient = 0.5 + 0.5 * pos.y;
+                            color = mix(vec3(0.02, 0.04, 0.08), color, gradient);
+                            gl_FragColor = vec4(color, 0.4);
+                        }
+                    `,
+                    transparent: true,
+                    side: THREE.BackSide,
+                });
+                this.skySphere = new THREE.Mesh(skyGeo, skyMat);
+                this.skySphere.position.y = 30;
+                this.scene.add(this.skySphere);
+            }
+
+            update(delta) {
+                if (!this.enabled) return;
+                this.time += delta * this.waveSpeed;
+
+                if (this.oceanMesh) {
+                    this.oceanMesh.material.uniforms.time.value = this.time;
+                    this.oceanMesh.material.uniforms.waveHeight.value = this.waveHeight;
+                    this.oceanMesh.material.uniforms.waveSpeed.value = this.waveSpeed;
+                    this.oceanMesh.material.uniforms.foamIntensity.value = this.foamIntensity;
+                }
+
+                if (this.skySphere) {
+                    this.skySphere.material.uniforms.time.value = this.time;
+                    this.skySphere.rotation.y += delta * 0.001;
+                }
+
+                if (this.particles) {
+                    const positions = this.particles.geometry.attributes.position.array;
+                    for (let i = 0; i < positions.length / 3; i++) {
+                        const x = positions[i * 3];
+                        const z = positions[i * 3 + 2];
+                        const waveHeight = this.waveHeight * 0.5;
+                        const wave = Math.sin(x * 0.3 + this.time * 0.5) * Math.cos(z * 0.2 + this.time * 0.3) * waveHeight;
+
+                        positions[i * 3 + 1] += this.particleVelocities[i * 3 + 1] * delta * 0.5;
+
+                        if (positions[i * 3 + 1] > 2 + wave || positions[i * 3 + 1] < -1) {
+                            positions[i * 3] = (Math.random() - 0.5) * 160;
+                            positions[i * 3 + 1] = -0.5 + Math.random() * 0.5;
+                            positions[i * 3 + 2] = (Math.random() - 0.5) * 160;
+                            this.particleVelocities[i * 3 + 1] = Math.random() * 0.3 + 0.1;
+                        }
+
+                        positions[i * 3] += this.particleVelocities[i * 3] * delta * 0.2;
+                        positions[i * 3 + 2] += this.particleVelocities[i * 3 + 2] * delta * 0.2;
+                    }
+                    this.particles.geometry.attributes.position.needsUpdate = true;
+                    this.particles.material.opacity = 0.15 + this.foamIntensity * 0.25;
+                }
+
+                // Update UI
+                const state = this.getOceanState();
+                document.getElementById('ocean-state').textContent = state.emoji + ' ' + state.text;
+                document.getElementById('wave-height').textContent = (this.waveHeight * 2).toFixed(1) + ' m';
+            }
+
+            getOceanState() {
+                const h = this.waveHeight;
+                if (h < 0.3) return { emoji: '🌊', text: 'calm' };
+                if (h < 0.6) return { emoji: '🌊', text: 'moderate' };
+                if (h < 1.2) return { emoji: '🌊', text: 'rough' };
+                return { emoji: '🌊', text: 'stormy' };
+            }
+
+            toggle() {
+                this.enabled = !this.enabled;
+                if (this.oceanMesh) this.oceanMesh.visible = this.enabled;
+                if (this.particles) this.particles.visible = this.enabled;
+                return this.enabled;
+            }
+        }
+
+        // --- INITIALIZATION ---
+        const container = document.getElementById('canvas-container');
+        const loading = document.getElementById('loading');
+
+        // Scene setup
+        const scene = new THREE.Scene();
+        scene.background = new THREE.Color(0x0b0e14);
+        scene.fog = new THREE.Fog(0x0b0e14, 80, 200);
+
+        const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 500);
+        camera.position.set(25, 15, 35);
+        camera.lookAt(0, 0, 0);
+
+        const renderer = new THREE.WebGLRenderer({ antialias: true });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+        renderer.shadowMap.enabled = true;
+        renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+        renderer.toneMapping = THREE.ACESFilmicToneMapping;
+        renderer.toneMappingExposure = 1.2;
+        container.appendChild(renderer.domElement);
+
+        const labelRenderer = new CSS2DRenderer();
+        labelRenderer.setSize(window.innerWidth, window.innerHeight);
+        labelRenderer.domElement.style.position = 'absolute';
+        labelRenderer.domElement.style.top = '0';
+        labelRenderer.domElement.style.left = '0';
+        labelRenderer.domElement.style.pointerEvents = 'none';
+        container.appendChild(labelRenderer.domElement);
+
+        const controls = new OrbitControls(camera, renderer.domElement);
+        controls.enableDamping = true;
+        controls.dampingFactor = 0.08;
+        controls.screenSpacePanning = true;
+       
