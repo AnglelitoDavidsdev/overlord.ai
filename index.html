@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Atlas - Ocean & Simulation Engine</title>
+    <title>Atlas - 3D Sphere World</title>
     <style>
         * {
             margin: 0;
@@ -26,16 +26,18 @@
         #hud {
             position: absolute;
             top: 20px;
-            left: 20px;
+            left: 50%;
+            transform: translateX(-50%);
             pointer-events: none;
             z-index: 10;
+            text-align: center;
         }
         #hud h1 {
             font-weight: 300;
             font-size: 1.3rem;
             letter-spacing: 2px;
             background: rgba(10, 14, 23, 0.8);
-            padding: 6px 16px;
+            padding: 6px 20px;
             border-radius: 30px;
             backdrop-filter: blur(8px);
             border: 1px solid rgba(255, 255, 255, 0.06);
@@ -45,7 +47,6 @@
             font-size: 0.7rem;
             opacity: 0.5;
             margin-top: 4px;
-            padding-left: 10px;
             letter-spacing: 1px;
         }
 
@@ -289,13 +290,13 @@
 </head>
 <body>
 
-    <div id="loading">🌊 Loading Atlas...</div>
+    <div id="loading">🌍 Loading Atlas Sphere...</div>
 
     <div id="canvas-container"></div>
 
     <div id="hud">
-        <h1>🌊 Atlas · Ocean Engine</h1>
-        <div class="sub">real-time 3D · simulations · interactive</div>
+        <h1>🌍 Atlas · 3D Sphere World</h1>
+        <div class="sub">real-time 3D · globe · simulations</div>
     </div>
 
     <div id="info">
@@ -324,6 +325,7 @@
         <div class="slider-label" style="margin-top:4px;"><span>Speed</span><span id="s-val">1.0</span></div>
         <input type="range" class="slider" id="speed-slider" min="0.1" max="3" step="0.1" value="1.0" />
         <button style="width:100%;margin-top:6px;background:rgba(0,150,255,0.1);border:1px solid rgba(0,150,255,0.2);color:#4af;padding:3px;border-radius:12px;font-size:0.6rem;cursor:pointer;" id="toggle-ocean">⏸️ Pause</button>
+        <button style="width:100%;margin-top:4px;background:rgba(0,150,255,0.1);border:1px solid rgba(0,150,255,0.2);color:#4af;padding:3px;border-radius:12px;font-size:0.6rem;cursor:pointer;" id="spin-btn">🔄 Auto-Spin</button>
     </div>
 
     <div id="controls">
@@ -375,16 +377,15 @@
         import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
         import { CSS2DRenderer, CSS2DObject } from 'three/addons/renderers/CSS2DRenderer.js';
 
-        // --- QUICK SETUP ---
+        // --- SETUP ---
         const container = document.getElementById('canvas-container');
         document.getElementById('loading').style.display = 'none';
 
         const scene = new THREE.Scene();
-        scene.background = new THREE.Color(0x0a0e17);
-        scene.fog = new THREE.Fog(0x0a0e17, 60, 150);
+        scene.background = new THREE.Color(0x05080f);
 
-        const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 500);
-        camera.position.set(20, 12, 28);
+        const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000);
+        camera.position.set(0, 0, 40);
 
         const renderer = new THREE.WebGLRenderer({ antialias: true });
         renderer.setSize(window.innerWidth, window.innerHeight);
@@ -394,7 +395,6 @@
         renderer.toneMappingExposure = 1.2;
         container.appendChild(renderer.domElement);
 
-        // CSS2 Renderer for labels
         const labelRenderer = new CSS2DRenderer();
         labelRenderer.setSize(window.innerWidth, window.innerHeight);
         labelRenderer.domElement.style.position = 'absolute';
@@ -406,49 +406,82 @@
         const controls = new OrbitControls(camera, renderer.domElement);
         controls.enableDamping = true;
         controls.dampingFactor = 0.08;
-        controls.maxPolarAngle = Math.PI / 2.1;
-        controls.minDistance = 3;
-        controls.maxDistance = 100;
-        controls.target.set(0, 1, 0);
+        controls.minDistance = 15;
+        controls.maxDistance = 80;
+        controls.target.set(0, 0, 0);
 
         // --- LIGHTING ---
-        scene.add(new THREE.AmbientLight(0x334466, 0.6));
+        const ambient = new THREE.AmbientLight(0x223344, 0.5);
+        scene.add(ambient);
+
         const sun = new THREE.DirectionalLight(0xffeedd, 1.0);
-        sun.position.set(30, 40, 20);
-        sun.castShadow = true;
-        sun.shadow.mapSize.width = 512;
-        sun.shadow.mapSize.height = 512;
-        sun.shadow.camera.near = 0.5;
-        sun.shadow.camera.far = 100;
-        sun.shadow.camera.left = -50;
-        sun.shadow.camera.right = 50;
-        sun.shadow.camera.top = 50;
-        sun.shadow.camera.bottom = -50;
+        sun.position.set(30, 40, 30);
         scene.add(sun);
-        scene.add(new THREE.HemisphereLight(0x445566, 0x221100, 0.5));
 
-        // --- GROUND ---
-        const ground = new THREE.Mesh(
-            new THREE.PlaneGeometry(150, 150),
-            new THREE.MeshStandardMaterial({ color: 0x141a24, roughness: 0.9, metalness: 0.1 })
-        );
-        ground.rotation.x = -Math.PI / 2;
-        ground.position.y = -0.2;
-        ground.receiveShadow = true;
-        scene.add(ground);
+        const sun2 = new THREE.DirectionalLight(0x4488ff, 0.3);
+        sun2.position.set(-30, -20, -30);
+        scene.add(sun2);
 
-        const grid = new THREE.GridHelper(100, 20, 0x2a3a5a, 0x1a2a3a);
-        grid.position.y = -0.1;
-        scene.add(grid);
+        const hemi = new THREE.HemisphereLight(0x445566, 0x221100, 0.6);
+        scene.add(hemi);
 
-        // --- OCEAN (Simple but beautiful) ---
-        const oceanGeo = new THREE.PlaneGeometry(150, 150, 80, 80);
-        oceanGeo.rotateX(-Math.PI / 2);
+        // --- STARFIELD ---
+        const starsGeo = new THREE.BufferGeometry();
+        const starCount = 3000;
+        const starPos = new Float32Array(starCount * 3);
+        for (let i = 0; i < starCount * 3; i++) {
+            starPos[i] = (Math.random() - 0.5) * 500;
+        }
+        starsGeo.setAttribute('position', new THREE.BufferAttribute(starPos, 3));
+        const starsMat = new THREE.PointsMaterial({
+            color: 0xffffff,
+            size: 0.3,
+            transparent: true,
+            opacity: 0.8,
+        });
+        const stars = new THREE.Points(starsGeo, starsMat);
+        scene.add(stars);
+
+        // --- SPHERE WORLD ---
+        const sphereRadius = 12;
+        const sphereGroup = new THREE.Group();
+        scene.add(sphereGroup);
+
+        // Atmosphere glow
+        const glowGeo = new THREE.SphereGeometry(sphereRadius * 1.02, 64, 64);
+        const glowMat = new THREE.ShaderMaterial({
+            transparent: true,
+            side: THREE.BackSide,
+            uniforms: {
+                time: { value: 0 },
+            },
+            vertexShader: `
+                varying vec3 vNormal;
+                void main() {
+                    vNormal = normalize(normalMatrix * normal);
+                    gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+                }
+            `,
+            fragmentShader: `
+                uniform float time;
+                varying vec3 vNormal;
+                void main() {
+                    float intensity = pow(0.6 - dot(vNormal, vec3(0.0, 0.0, 1.0)), 2.0);
+                    vec3 color = mix(vec3(0.1, 0.3, 0.8), vec3(0.3, 0.6, 1.0), intensity);
+                    gl_FragColor = vec4(color, intensity * 0.3);
+                }
+            `,
+        });
+        const glow = new THREE.Mesh(glowGeo, glowMat);
+        sphereGroup.add(glow);
+
+        // --- OCEAN SPHERE ---
+        const oceanGeo = new THREE.SphereGeometry(sphereRadius * 0.99, 128, 128);
 
         const oceanMat = new THREE.ShaderMaterial({
             uniforms: {
                 time: { value: 0 },
-                waveHeight: { value: 0.5 },
+                waveHeight: { value: 0.15 },
                 waveSpeed: { value: 1.0 },
             },
             vertexShader: `
@@ -461,110 +494,177 @@
                 void main() {
                     vec3 pos = position;
                     float h = 0.0;
-                    for(float i=0.0; i<6.0; i++){
-                        float f = 0.5 + i*0.4;
-                        float a = waveHeight * (0.4 + 0.6*sin(i*2.1));
-                        float s = waveSpeed * (0.7 + i*0.15);
-                        float ang = i*1.3 + 0.7;
+                    for(float i=0.0; i<8.0; i++){
+                        float f = 2.0 + i*1.5;
+                        float a = waveHeight * (0.3 + 0.7*sin(i*2.7 + time*0.1));
+                        float s = waveSpeed * (0.5 + i*0.1);
+                        float ang = i*1.7 + time*0.05;
                         vec2 d = vec2(cos(ang), sin(ang));
                         float w = sin(dot(pos.xz, d)*f + time*s);
                         h += w*a;
                     }
-                    h *= 0.6;
-                    pos.y += h;
+                    h *= 0.5;
+                    pos += normalize(pos) * h;
                     vHeight = h;
-                    vec3 n = normalize(vec3(0.0, 1.0, 0.0));
+                    vec3 n = normalize(position);
                     vNormal = n;
                     gl_Position = projectionMatrix * modelViewMatrix * vec4(pos, 1.0);
                 }
             `,
             fragmentShader: `
                 uniform float waveHeight;
+                uniform float time;
                 varying float vHeight;
+                varying vec3 vNormal;
 
                 void main() {
-                    float h = vHeight / max(waveHeight, 0.1);
-                    vec3 deep = vec3(0.0, 0.1, 0.25);
-                    vec3 shallow = vec3(0.0, 0.4, 0.6);
+                    float h = vHeight / max(waveHeight, 0.01);
+                    vec3 deep = vec3(0.0, 0.05, 0.15);
+                    vec3 shallow = vec3(0.0, 0.3, 0.5);
                     vec3 color = mix(deep, shallow, 0.5 + h*0.5);
-                    float foam = smoothstep(0.3, 0.7, h) * 0.3;
-                    color += vec3(0.8, 0.9, 1.0) * foam;
-                    float spec = pow(max(h, 0.0), 8.0) * 0.2;
-                    color += vec3(1.0) * spec;
-                    gl_FragColor = vec4(color, 0.8);
+
+                    float foam = smoothstep(0.3, 0.7, h) * 0.4;
+                    color += vec3(0.7, 0.8, 0.9) * foam;
+
+                    // Fresnel
+                    vec3 viewDir = normalize(cameraPosition - vNormal * 12.0);
+                    float fresnel = pow(1.0 - max(dot(viewDir, vNormal), 0.0), 3.0);
+                    color += vec3(0.3, 0.6, 0.9) * fresnel * 0.4;
+
+                    // Specular
+                    vec3 lightDir = normalize(vec3(1.0, 1.0, 1.0));
+                    vec3 halfVec = normalize(lightDir + viewDir);
+                    float spec = pow(max(dot(vNormal, halfVec), 0.0), 64.0);
+                    color += vec3(1.0, 0.9, 0.7) * spec * 0.5;
+
+                    gl_FragColor = vec4(color, 0.9);
                 }
             `,
             transparent: true,
             side: THREE.DoubleSide,
         });
 
-        const ocean = new THREE.Mesh(oceanGeo, oceanMat);
-        ocean.position.y = -0.15;
-        scene.add(ocean);
+        const oceanSphere = new THREE.Mesh(oceanGeo, oceanMat);
+        sphereGroup.add(oceanSphere);
 
-        // --- LANDMARKS ---
-        const landmarks = [
-            { name: 'Eiffel Tower', pos: [-10, 0, -6], color: 0x7a5a3a, h: 5 },
-            { name: 'Statue Liberty', pos: [8, 0, -4], color: 0x6a9a6a, h: 4 },
-            { name: 'Big Ben', pos: [-4, 0, 12], color: 0x8a7a5a, h: 4.5 },
-            { name: 'Colosseum', pos: [12, 0, 8], color: 0x9a7a5a, h: 3 },
-            { name: 'Opera House', pos: [-12, 0, 14], color: 0x7a9aaa, h: 3.5 },
-            { name: 'Taj Mahal', pos: [6, 0, -14], color: 0xdaaa7a, h: 5 },
-            { name: 'Pyramid', pos: [-16, 0, -16], color: 0x8a7a5a, h: 6 },
-            { name: 'Burj Khalifa', pos: [18, 0, -18], color: 0x6a8a9a, h: 8 },
+        // --- LANDMASSES (Simplified as continents on sphere) ---
+        const continentData = [
+            { lat: 20, lon: -10, size: 3, color: 0x2d4a2d }, // Africa
+            { lat: 45, lon: 10, size: 2.5, color: 0x3a5a3a }, // Europe
+            { lat: 40, lon: -80, size: 3.5, color: 0x2a4a2a }, // N America
+            { lat: -20, lon: -60, size: 2.5, color: 0x2d4a2d }, // S America
+            { lat: 30, lon: 100, size: 3.5, color: 0x3a5a3a }, // Asia
+            { lat: -25, lon: 135, size: 3, color: 0x2d4a2d }, // Australia
+        ];
+
+        function latLonToPos(lat, lon, radius) {
+            const phi = (90 - lat) * Math.PI / 180;
+            const theta = lon * Math.PI / 180;
+            return new THREE.Vector3(
+                radius * Math.sin(phi) * Math.cos(theta),
+                radius * Math.cos(phi),
+                radius * Math.sin(phi) * Math.sin(theta)
+            );
+        }
+
+        continentData.forEach(c => {
+            const pos = latLonToPos(c.lat, c.lon, sphereRadius * 0.98);
+            const continent = new THREE.Mesh(
+                new THREE.SphereGeometry(c.size * 0.3, 12, 12),
+                new THREE.MeshStandardMaterial({
+                    color: c.color,
+                    roughness: 0.7,
+                    metalness: 0.1,
+                })
+            );
+            continent.position.copy(pos);
+            // Flatten slightly on sphere surface
+            continent.scale.set(1, 0.15, 1);
+            continent.lookAt(new THREE.Vector3(0, 0, 0));
+            sphereGroup.add(continent);
+        });
+
+        // --- LANDMARKS ON SPHERE ---
+        const landmarkPositions = [
+            { name: 'Eiffel Tower', lat: 48.8584, lon: 2.2945, color: 0x7a5a3a, height: 0.8 },
+            { name: 'Statue Liberty', lat: 40.6892, lon: -74.0445, color: 0x6a9a6a, height: 0.6 },
+            { name: 'Big Ben', lat: 51.5007, lon: -0.1246, color: 0x8a7a5a, height: 0.7 },
+            { name: 'Colosseum', lat: 41.8902, lon: 12.4922, color: 0x9a7a5a, height: 0.5 },
+            { name: 'Opera House', lat: -33.8568, lon: 151.2153, color: 0x7a9aaa, height: 0.6 },
+            { name: 'Taj Mahal', lat: 27.1751, lon: 78.0421, color: 0xdaaa7a, height: 0.8 },
+            { name: 'Pyramid', lat: 29.9792, lon: 31.1342, color: 0x8a7a5a, height: 0.9 },
+            { name: 'Burj Khalifa', lat: 25.1972, lon: 55.2744, color: 0x6a8a9a, height: 1.0 },
+            { name: 'Tokyo Tower', lat: 35.6586, lon: 139.7454, color: 0xcc5533, height: 0.7 },
+            { name: 'Sydney Harbour', lat: -33.8547, lon: 151.2117, color: 0x4a8a9a, height: 0.5 },
         ];
 
         const objects = [];
         const labels = [];
 
-        function createLandmark(data) {
+        function createLandmarkOnSphere(data) {
+            const pos = latLonToPos(data.lat, data.lon, sphereRadius * 0.98);
             const g = new THREE.Group();
-            const h = data.h;
+            const h = data.height;
             const col = new THREE.Color(data.color);
 
             // Base
             const base = new THREE.Mesh(
-                new THREE.BoxGeometry(1.6, 0.3, 1.6),
+                new THREE.CylinderGeometry(0.25, 0.3, 0.08, 6),
                 new THREE.MeshStandardMaterial({ color: col, roughness: 0.5, metalness: 0.2 })
             );
-            base.position.y = 0.15;
-            base.castShadow = true;
+            base.position.y = 0.04;
             g.add(base);
 
             // Body
             const body = new THREE.Mesh(
-                new THREE.CylinderGeometry(0.6, 0.9, h, 6),
+                new THREE.CylinderGeometry(0.08, 0.15, h, 6),
                 new THREE.MeshStandardMaterial({ color: col, roughness: 0.4, metalness: 0.3 })
             );
-            body.position.y = 0.3 + h / 2;
-            body.castShadow = true;
+            body.position.y = 0.08 + h / 2;
             g.add(body);
 
             // Top
             const top = new THREE.Mesh(
-                new THREE.SphereGeometry(0.3, 6, 6),
-                new THREE.MeshStandardMaterial({ color: 0xffaa44, emissive: 0xff5500, emissiveIntensity: 0.2 })
+                new THREE.SphereGeometry(0.05, 6, 6),
+                new THREE.MeshStandardMaterial({
+                    color: 0xffaa44,
+                    emissive: 0xff5500,
+                    emissiveIntensity: 0.3
+                })
             );
-            top.position.y = 0.3 + h + 0.2;
+            top.position.y = 0.08 + h + 0.05;
             g.add(top);
 
-            g.position.set(data.pos[0], -0.15, data.pos[2]);
-            g.userData = { name: data.name, height: h, color: data.color };
-            scene.add(g);
+            g.position.copy(pos);
+            // Orient to sphere surface
+            g.lookAt(new THREE.Vector3(0, 0, 0));
+            g.rotateX(Math.PI / 2);
+
+            g.userData = {
+                name: data.name,
+                lat: data.lat,
+                lon: data.lon,
+                height: h,
+                color: data.color
+            };
+            sphereGroup.add(g);
             objects.push(g);
 
-            // Label (CSS2D)
+            // Label
+            const labelPos = latLonToPos(data.lat, data.lon, sphereRadius * 1.15);
             const div = document.createElement('div');
             div.textContent = data.name;
             div.style.cssText =
-                'color:#dde;font-size:11px;font-weight:400;text-shadow:0 2px 20px rgba(0,0,0,0.9);background:rgba(10,14,23,0.6);padding:2px 12px;border-radius:12px;backdrop-filter:blur(4px);border:1px solid rgba(255,255,255,0.05);pointer-events:none;';
+                'color:#dde;font-size:10px;font-weight:400;text-shadow:0 2px 20px rgba(0,0,0,0.9);background:rgba(10,14,23,0.5);padding:2px 10px;border-radius:10px;backdrop-filter:blur(4px);border:1px solid rgba(255,255,255,0.05);pointer-events:none;white-space:nowrap;';
             const label = new CSS2DObject(div);
-            label.position.set(data.pos[0], h + 1.5, data.pos[2]);
-            scene.add(label);
+            label.position.copy(labelPos);
+            sphereGroup.add(label);
             labels.push(label);
+
+            return { group: g, label: label };
         }
 
-        landmarks.forEach(createLandmark);
+        landmarkPositions.forEach(data => createLandmarkOnSphere(data));
 
         // --- SIMULATION ENGINE ---
         const sim = {
@@ -574,7 +674,14 @@
             growth: { enabled: false, data: {} },
             paused: false,
             time: 0,
-            landmarkData: landmarks.map(l => ({ ...l, pop: 100 + Math.random() * 900, traffic: 10 + Math.random() * 90 })),
+            autoSpin: false,
+            spinSpeed: 0.002,
+            landmarkData: landmarkPositions.map(l => ({
+                ...l,
+                pop: 100 + Math.random() * 900,
+                traffic: 10 + Math.random() * 90,
+                height: l.height,
+            })),
 
             update(dt) {
                 if (this.paused) return;
@@ -598,26 +705,28 @@
 
                 if (this.growth.enabled) {
                     this.landmarkData.forEach((l, i) => {
-                        l.h += 0.001 * dt * 5;
-                        l.h = Math.min(20, l.h);
+                        l.height += 0.0005 * dt * 5;
+                        l.height = Math.min(2.0, l.height);
                         // Update 3D object
                         if (objects[i]) {
                             const body = objects[i].children[1];
                             if (body) {
-                                body.scale.y = l.h / landmarks[i].h;
-                                body.position.y = 0.3 + l.h / 2;
+                                body.scale.y = l.height / landmarkPositions[i].height;
+                                body.position.y = 0.08 + l.height / 2;
                             }
                             const top = objects[i].children[2];
                             if (top) {
-                                top.position.y = 0.3 + l.h + 0.2;
-                            }
-                            // Update label
-                            if (labels[i]) {
-                                labels[i].position.y = l.h + 1.5;
+                                top.position.y = 0.08 + l.height + 0.05;
                             }
                         }
                     });
-                    this.growth.data.avgHeight = this.landmarkData.reduce((s, l) => s + l.h, 0) / this.landmarkData.length;
+                    this.growth.data.avgHeight = this.landmarkData.reduce((s, l) => s + l.height, 0) / this.landmarkData
+                        .length;
+                }
+
+                // Auto-spin
+                if (this.autoSpin) {
+                    sphereGroup.rotation.y += this.spinSpeed;
                 }
             },
 
@@ -631,20 +740,25 @@
                 return this.paused;
             },
 
+            toggleSpin() {
+                this.autoSpin = !this.autoSpin;
+                return this.autoSpin;
+            },
+
             reset() {
                 this.landmarkData.forEach((l, i) => {
                     l.pop = 100 + Math.random() * 900;
                     l.traffic = 10 + Math.random() * 90;
-                    l.h = landmarks[i].h;
+                    l.height = landmarkPositions[i].height;
                     if (objects[i]) {
                         const body = objects[i].children[1];
                         if (body) body.scale.y = 1;
                         const top = objects[i].children[2];
-                        if (top) top.position.y = 0.3 + l.h + 0.2;
-                        if (labels[i]) labels[i].position.y = l.h + 1.5;
+                        if (top) top.position.y = 0.08 + l.height + 0.05;
                     }
                 });
                 this.time = 0;
+                sphereGroup.rotation.set(0, 0, 0);
             }
         };
 
@@ -688,8 +802,8 @@
         document.getElementById('height-slider').addEventListener('input', (e) => {
             const v = parseFloat(e.target.value);
             document.getElementById('h-val').textContent = v.toFixed(1);
-            ocean.material.uniforms.waveHeight.value = v;
-            document.getElementById('wave-height').textContent = v.toFixed(1) + 'm';
+            oceanSphere.material.uniforms.waveHeight.value = v * 0.15;
+            document.getElementById('wave-height').textContent = (v * 0.3).toFixed(1) + 'm';
             const state = v < 0.3 ? '🌊 calm' : v < 0.6 ? '🌊 moderate' : v < 1.2 ? '🌊 rough' : '🌊 stormy';
             document.getElementById('ocean-state').textContent = state;
         });
@@ -697,17 +811,22 @@
         document.getElementById('speed-slider').addEventListener('input', (e) => {
             const v = parseFloat(e.target.value);
             document.getElementById('s-val').textContent = v.toFixed(1);
-            ocean.material.uniforms.waveSpeed.value = v;
+            oceanSphere.material.uniforms.waveSpeed.value = v;
         });
 
         document.getElementById('toggle-ocean').addEventListener('click', () => {
-            ocean.visible = !ocean.visible;
-            document.getElementById('toggle-ocean').textContent = ocean.visible ? '⏸️ Pause' : '▶️ Play';
+            oceanSphere.visible = !oceanSphere.visible;
+            document.getElementById('toggle-ocean').textContent = oceanSphere.visible ? '⏸️ Pause' : '▶️ Play';
         });
 
         document.getElementById('ocean-btn').addEventListener('click', () => {
-            ocean.visible = !ocean.visible;
+            oceanSphere.visible = !oceanSphere.visible;
             document.getElementById('ocean-btn').classList.toggle('active');
+        });
+
+        document.getElementById('spin-btn').addEventListener('click', () => {
+            const spinning = sim.toggleSpin();
+            document.getElementById('spin-btn').textContent = spinning ? '⏸️ Stop Spin' : '🔄 Auto-Spin';
         });
 
         document.getElementById('pause-sims').addEventListener('click', () => {
@@ -725,26 +844,28 @@
 
         document.getElementById('reset-btn').addEventListener('click', () => {
             sim.reset();
-            // Reset ocean
             document.getElementById('height-slider').value = 0.5;
             document.getElementById('h-val').textContent = '0.5';
-            ocean.material.uniforms.waveHeight.value = 0.5;
-            document.getElementById('wave-height').textContent = '0.5m';
+            oceanSphere.material.uniforms.waveHeight.value = 0.075;
+            document.getElementById('wave-height').textContent = '0.2m';
             document.getElementById('ocean-state').textContent = '🌊 calm';
+            sphereGroup.rotation.set(0, 0, 0);
         });
 
         document.getElementById('save-btn').addEventListener('click', () => {
             const data = sim.landmarkData.map(l => ({
                 name: l.name,
+                lat: l.lat,
+                lon: l.lon,
                 population: Math.round(l.pop),
                 traffic: Math.round(l.traffic),
-                height: l.h.toFixed(2)
+                height: l.height.toFixed(2)
             }));
             const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.href = url;
-            a.download = 'atlas_data.json';
+            a.download = 'atlas_sphere_data.json';
             a.click();
         });
 
@@ -755,8 +876,15 @@
             const dt = Math.min((time - lastTime) / 1000, 0.05);
             lastTime = time;
 
-            ocean.material.uniforms.time.value += dt * ocean.material.uniforms.waveSpeed.value;
+            // Update ocean
+            oceanSphere.material.uniforms.time.value += dt * oceanSphere.material.uniforms.waveSpeed.value;
+            glow.material.uniforms.time.value += dt;
+
+            // Update sims
             sim.update(dt);
+
+            // Rotate stars slowly
+            stars.rotation.y += dt * 0.002;
 
             controls.update();
             renderer.render(scene, camera);
@@ -774,7 +902,9 @@
 
         animate(0);
 
-        console.log('🌊 Atlas Ready!');
+        console.log('🌍 Atlas Sphere Ready!');
+        console.log('🏛️ ' + objects.length + ' landmarks on sphere');
+        console.log('🌊 Dynamic ocean with ' + oceanGeo.attributes.position.count + ' vertices');
     </script>
 </body>
 </html>
